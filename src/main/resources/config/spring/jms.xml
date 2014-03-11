@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns="http://www.springframework.org/schema/beans"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd">
+
+	<!-- 配置JMS连接工厂 -->
+	<!-- JNDI上下文(它是取得JMS资源的起始位置) -->
+	<bean id="jndiTemplate" class="org.springframework.jndi.JndiTemplate">
+		<property name="environment">
+			<props>
+				<prop key="java.naming.factory.initial">
+					org.jboss.naming.remote.client.InitialContextFactory
+				</prop>
+				<prop key="java.naming.provider.url">remote://192.168.9.100:14447</prop>
+				<prop key="java.naming.security.principal">
+					oct
+				</prop>
+				<prop key="java.naming.security.credentials">
+					123456
+				</prop>
+			</props>
+		</property>
+	</bean>
+
+	<!-- JMS连接工厂 -->
+	<bean id="jmsConnectionFactory" class="org.springframework.jndi.JndiObjectFactoryBean">
+		<property name="jndiTemplate">
+			<ref bean="jndiTemplate" />
+		</property>
+		<property name="jndiName">
+			<value>jms/RemoteConnectionFactory</value>
+		</property>
+	</bean>
+
+	<!-- JMS模板配置 -->
+	<bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+		<property name="connectionFactory" ref="jmsConnectionFactory" />
+		<property name="defaultDestination" ref="topicDestination" />
+		<property name="pubSubDomain">
+			<value>true</value>
+		</property>
+		<!-- 等待消息的时间(ms) -->
+		<property name="receiveTimeout">
+			<value>30000</value>
+		</property>
+	</bean>
+
+	<bean id="topicDestination" class="org.springframework.jndi.JndiObjectFactoryBean">
+		<property name="jndiTemplate">
+			<ref bean="jndiTemplate" />
+		</property>
+		<property name="jndiName">
+			<value>jms/topic/test</value>
+		</property>
+	</bean>
+
+	 <bean id="topicMessageProducer" class="com.mopon.jms.impl.TopicMessageProducerImpl">  
+        <property name="template" ref="jmsTemplate" />  
+        <property name="destination" ref="topicDestination" />  
+    </bean>
+
+	<bean id="topicMessageMdp" class="com.mopon.jms.impl.MessageMdp"></bean>
+
+    
+    <bean class="org.springframework.jms.listener.SimpleMessageListenerContainer">
+		<property name="connectionFactory" ref="jmsConnectionFactory"></property>
+		<property name="destination" ref="topicDestination"></property>
+		<property name="messageListener" ref="topicMessageMdp"></property>
+	</bean>
+
+</beans>

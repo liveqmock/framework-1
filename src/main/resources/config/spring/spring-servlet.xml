@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns="http://www.springframework.org/schema/beans"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.2.xsd">
+        
+    <aop:aspectj-autoproxy/>
+
+	<!-- <mvc:annotation-driven /> -->
+
+	<context:annotation-config />
+
+	<context:component-scan base-package="com.mopon" />
+	
+	<context:property-placeholder location="classpath:config/sysconfig.properties"/>
+	
+	<bean id="authorityInterceptor" class="com.mopon.interceptor.AuthorityInterceptor"/>
+	
+	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter"/>  
+      
+	<bean id="handlerMapping"  class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping">    
+	    <property name="interceptors">    
+	        <list>    
+	            <ref bean="authorityInterceptor"/>    
+	        </list>    
+	    </property>    
+	</bean>  
+	
+	
+
+	<bean
+		class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver"
+		p:order="0" >
+
+		<property name="mediaTypes">
+			<map>
+				<entry key="html" value="text/html" /> 
+				<entry key="xls" value="application/vnd.ms-excel" />
+				<entry key="json" value="application/json" />
+				<entry key="xml" value="application/xml" />
+				<entry key="pdf" value="application/pdf" />
+				<entry key="pb"  value="application/octet-stream" />
+			</map>
+		</property>
+		<property name="defaultViews">
+			<list>
+				<bean class="com.mopon.views.MappingJacksonJsonView" p:renderedAttributes="jsonData"/>
+				<bean class="org.springframework.web.servlet.view.xml.MarshallingView" p:modelKey="xmlData">
+					<constructor-arg>
+						<bean class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
+							<property name="classesToBeBound">
+								<list>
+									<value>com.mopon.entity.sys.XmlBeanList</value>
+									<value>com.mopon.entity.Bill</value>
+								</list>
+							</property>
+						</bean>
+					</constructor-arg>
+				</bean>
+				<bean class="com.mopon.views.ViewExcel" />
+				<bean class="com.mopon.views.ViewPDF" />
+				<bean class="com.mopon.views.Protobuf" />
+			</list>
+		</property>
+		<property name="viewResolvers">
+			<list>
+				<bean class="org.springframework.web.servlet.view.BeanNameViewResolver"
+					p:order="10" />
+				<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"
+					p:order="0" 
+					p:prefix="/WEB-INF/views/" 
+					p:suffix=".jsp"
+					p:viewClass="org.springframework.web.servlet.view.JstlView" />
+			</list>
+		</property>
+	</bean>
+	
+	
+	<mvc:resources cache-period="31556926" location="/lib/"
+		mapping="/lib/**" />
+		
+	<mvc:resources cache-period="31556926" location="/app/"
+		mapping="/app/**" />
+	
+	<mvc:resources cache-period="31556926" location="/WEB-INF/views/"
+		mapping="/WEB-INF/views/**" />
+
+	<mvc:resources cache-period="31556926" location="resources/"
+		mapping="/resources/**" />
+
+
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="maxUploadSize" value="1073741824" />
+		<property name="maxInMemorySize" value="4096" />
+	</bean>
+	
+	<bean id="ftpClientFacotry" class="com.mopon.ftp.FtpFactoryBean">
+		<constructor-arg type="java.lang.String">
+			<value>${ftp.server.url}</value>
+		</constructor-arg>
+		<constructor-arg type="int">
+			<value>${ftp.server.port}</value>
+		</constructor-arg>
+		<constructor-arg type="java.lang.String">
+			<value>${ftp.server.path}</value>
+		</constructor-arg>
+		<constructor-arg type="java.lang.String">
+			<value>${ftp.server.username}</value>
+		</constructor-arg>
+		<constructor-arg type="java.lang.String">
+			<value>${ftp.server.password}</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="loggerAsynWrite" class="com.mopon.asyn.LoggerAsynWrite" scope="singleton"/>
+	
+</beans>

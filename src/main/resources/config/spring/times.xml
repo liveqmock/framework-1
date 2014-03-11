@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans   
+                        http://www.springframework.org/schema/beans/spring-beans-3.2.xsd">
+
+	<bean name="loggerTaskJob" class="com.mopon.timer.LoggerTaskJob" />
+	
+	<bean id="loggerTaskDetail"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean"
+		lazy-init="false">
+		<property name="targetObject">
+			<ref bean="loggerTaskJob" />
+		</property>
+		<property name="targetMethod">
+			<value>execute</value>
+		</property>
+	</bean>
+	
+		<!-- 定义触发时间 -->
+	<bean id="cronLoggerTriggerBean" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="loggerTaskDetail"></property>
+		<property name="cronExpression" value="0/5 * * * * ?"></property>
+	</bean>
+	
+	<bean name="taskJob" class="com.mopon.timer.TaskJob" />
+	
+	<bean id="taskJobDetail"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean"
+		lazy-init="false">
+		<property name="targetObject">
+			<ref bean="taskJob" />
+		</property>
+		<property name="targetMethod">
+			<value>execute</value>
+		</property>
+	</bean>
+	
+	<!-- 定义触发时间 -->
+	<bean id="cronTriggerBean" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="taskJobDetail"></property>
+		<property name="cronExpression" value="0/5 * * * * ?"></property>
+	</bean>
+	
+	<!-- 总管理类 如果将lazy-init='false'那么容器启动就会执行调度程序 -->
+	<bean id="startQuertz" lazy-init="false" autowire="no"
+		class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="triggers">
+			<list>
+				<ref bean="cronTriggerBean" />
+				<ref bean="cronLoggerTriggerBean" />
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="loggerUtil" class="com.mopon.util.LoggerUtil"></bean>
+
+
+	<bean name="taskSerializableJob" class="org.springframework.scheduling.quartz.JobDetailBean">
+		<property name="jobClass">
+			<value>com.mopon.timer.SerializableTaskJob</value>
+		</property>
+	</bean>
+	
+	<!-- 定义触发时间 -->
+	<bean id="cronSerializableTriggerBean" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="taskSerializableJob"></property>
+		<property name="cronExpression" value="0/5 * * * * ?"></property>
+	</bean>
+
+
+	<!-- 总管理类 如果将lazy-init='false'那么容器启动就会执行调度程序 -->
+	<!-- <bean id="startSerializableQuertz" lazy-init="false" autowire="no"
+		class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="triggers">
+			<list>
+				<ref bean="cronSerializableTriggerBean" />
+			</list>
+		</property>
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="applicationContextSchedulerContextKey" value="applicationContext" />
+		<property name="configLocation" value="classpath:config/quartz.properties" />
+	</bean> -->
+
+</beans>

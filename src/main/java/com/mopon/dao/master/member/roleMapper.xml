@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mopon.dao.master.member.IRoleDao">
+	
+	<resultMap type="Role" id="roleResultMap">
+		<id property="roleId" column="ROLE_ID" />
+		<result property="roleName" column="ROLE_NAME" />
+		<result property="createUser" column="CREATE_USER" />
+		<result property="createDate" column="CREATE_DATE" />
+		<result property="roleDsc" column="ROLE_DESC" />
+		<result property="parentRoleId" column="PARENT_ROLE_ID"/>
+	</resultMap>
+	
+	<resultMap type="RoleMenu" id="roleMenuResultMap">
+		<id property="id" column="ID" />
+		<result property="roleId" column="ROLE_ID" />
+		<result property="menuId" column="MENU_ID" />
+	</resultMap>
+	<resultMap type="RoleOperate" id="roleOperateResultMap">
+		<id property="id" column="ID" />
+		<result property="roleId" column="ROLE_ID" />
+		<result property="operateId" column="OP_ID" />
+	</resultMap>
+	<resultMap type="GroupRole" id="roleGroupResultMap">
+		<id property="id" column="ID" />
+		<result property="roleId" column="ROLE_ID" />
+		<result property="groupId" column="GROUP_ID" />
+	</resultMap>
+	
+	
+	<!-- 添加角色 -->
+	<insert id="save" parameterType="Role"  useGeneratedKeys="true" keyProperty="roleId">
+		INSERT INTO  RIGHT_ROLE (ROLE_NAME, CREATE_USER, CREATE_DATE, ROLE_DESC,PARENT_ROLE_ID) VALUES(#{roleName}, #{createUser}, #{createDate}, #{roleDsc},#{parentRoleId} )
+	</insert>
+	<!-- 添加角色菜单 -->
+	<insert id="saveRoleMenu" parameterType="RoleMenu">
+		INSERT INTO RIGHT_ROLE_MENUITEM (ROLE_ID,MENU_ID) VALUES(#{roleId},#{menuId})
+	</insert>
+	<!-- 添加角色操作 -->
+	<insert id="saveRoleOperate" parameterType="RoleOperate">
+		INSERT INTO RIGHT_ROLE_OPERATE (ROLE_ID,OP_ID) VALUES(#{roleId},#{operateId})
+	</insert>
+	
+	<!-- 添加角色组 -->
+	<insert id="saveRoleGroup" parameterType="GroupRole">
+		INSERT INTO RIGHT_GROUP_ROLE (GROUP_ID,ROLE_ID) VALUES(#{groupId},#{roleId})
+	</insert>
+	
+	<!-- 更新角色 -->
+	<update id="update" parameterType="Role">
+		UPDATE RIGHT_ROLE SET ROLE_NAME = #{roleName}, ROLE_DESC = #{roleDsc} WHERE ROLE_ID = #{roleId}
+	</update>
+	
+	<!--  取消用户角色-->
+	<update id="updateMemberRole" parameterType="int">
+		update COMMON_MEMBER set ROLE_ID = null where ROLE_ID = #{roleId}
+	</update>
+	
+	<!-- 删除角色 -->
+	<delete id="remove" parameterType="int">
+		DELETE FROM RIGHT_ROLE WHERE ROLE_ID = #{roleId}
+	</delete>
+	
+	<!-- 删除角色菜单 -->
+	<delete id="removeRoleMenuById" parameterType="int">
+		DELETE FROM RIGHT_ROLE_MENUITEM where ID = #{id}
+	</delete>
+	<delete id="removeRoleMenu" parameterType="int">
+		DELETE FROM RIGHT_ROLE_MENUITEM where ROLE_ID = #{roleId} and MENU_ID = #{menuId}
+	</delete>
+	<delete id="removeRoleMenuByRoleId" parameterType="int">
+		DELETE FROM RIGHT_ROLE_MENUITEM where ROLE_ID = #{roleId}
+	</delete>
+	<delete id="removeRoleMenuByMenuId" parameterType="int">
+		DELETE FROM RIGHT_ROLE_MENUITEM where MENU_ID = #{menuId}
+	</delete>
+	
+	<!-- 删除角色操作 -->
+	<delete id="removeRoleOperateById" parameterType="int">
+		DELETE FROM RIGHT_ROLE_OPERATE where ID = #{id}
+	</delete>
+	<delete id="removeRoleOperateByRoleId" parameterType="int">
+		DELETE FROM RIGHT_ROLE_OPERATE where ROLE_ID = #{roleId}
+	</delete>
+	<delete id="removeRoleOperate" parameterType="int">
+		DELETE FROM RIGHT_ROLE_OPERATE where ROLE_ID = #{roleId} and OP_ID = #{operateId}
+	</delete>
+	<delete id="removeRoleOperateByOperateId" parameterType="int">
+		DELETE FROM RIGHT_ROLE_OPERATE where OP_ID = #{operateId}
+	</delete>		
+	<!-- 删除角色组 -->
+	<delete id="removeRoleGroupById" parameterType="int">
+		delete from RIGHT_GROUP_ROLE where ID = #{id}
+	</delete>
+	<delete id="removeRoleGroupByRoleId" parameterType="int">
+		delete from RIGHT_GROUP_ROLE where  ROLE_ID = #{roleId} 
+	</delete>
+	<delete id="removeRoleGroupByGroupId" parameterType="int">
+		delete from RIGHT_GROUP_ROLE where GROUP_ID = #{groupId}
+	</delete>	
+	<!-- 查询角色  parentRoleId = -999 表示查询所有 -->
+	<select id="queryRoles" parameterType="Role" resultMap="roleResultMap">
+		SELECT * FROM RIGHT_ROLE where 1=1
+		<if test="role.roleId != null"> and ROLE_ID = #{role.roleId} </if>
+		<if test="role.roleName != null and role.roleName !=''"> AND  ROLE_NAME like  CONCAT('%',#{role.roleName},'%')  </if>
+		<if test="role.createUser != null and role.createUser !=''"> and CREATE_USER = #{role.createUser} </if>	
+		<if test="role.parentRoleId != -999"> and PARENT_ROLE_ID = #{role.parentRoleId} </if>	
+		 order by ROLE_ID desc
+		 LIMIT #{startPage,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+	</select>
+	<select id="queryAllRoles" resultMap="roleResultMap">
+		SELECT * FROM RIGHT_ROLE 
+	</select>
+	
+	<!-- 查询角色记录总数 -->
+	<select id="queryCount" parameterType="Role" resultType="int">
+		SELECT count(ROLE_ID)  FROM RIGHT_ROLE where 1=1
+		<if test="role.roleId != null"> and ROLE_ID = #{role.roleId} </if>
+		<if test="role.roleName != null and role.roleName !=''"> AND  ROLE_NAME like  CONCAT('%',#{role.roleName},'%') </if>
+		<if test="role.createUser != null and role.createUser !=''"> and CREATE_USER = #{role.createUser} </if>	
+		<if test="role.parentRoleId != -999"> and PARENT_ROLE_ID = #{role.parentRoleId} </if>	
+	</select>
+
+	
+	<!-- 查询子类角色 -->
+	<select id="queryRoleIdByParentRoleId" resultMap="roleResultMap" parameterType="int">
+		select * from RIGHT_ROLE where PARENT_ROLE_ID  = #{parentRoleId}
+		<!-- <foreach item="item" index="index" collection="array" open="(" separator="," close=")">#{item}</foreach> -->
+	</select>
+	
+	<!-- 根据角色名查询角色 -->
+	<select id="queryRoleByRoleName" parameterType="String" resultMap="roleResultMap">
+		select *  from RIGHT_ROLE where ROLE_NAME = #{roleName}
+	</select>
+	
+	<!-- 根据角色ID查询角色 -->
+	<select id="queryRoleByRoleID" parameterType="int" resultMap="roleResultMap">
+		SELECT * FROM RIGHT_ROLE  WHERE ROLE_ID = #{roleId} 
+	</select>
+	
+	<!-- 根据角色ID查询菜单 -->
+	<select id="queryMenuByRoleID" parameterType="int" resultMap="com.mopon.dao.master.member.IMenuItemDao.menuItemResultMap">
+		SELECT m.* FROM RIGHT_MENUITEM m 
+		left join RIGHT_ROLE_MENUITEM rm on m.MENU_ID = rm.MENU_ID
+		left join RIGHT_ROLE r on rm.ROLE_ID = r.ROLE_ID
+		WHERE r.ROLE_ID = #{roleId} 
+	</select>
+	
+	<!-- 根据角色ID查询操作 -->
+	<select id="queryOperateByRoleID" parameterType="int" resultMap="com.mopon.dao.master.member.IOperateDao.operateResultMap">
+		SELECT o.* FROM RIGHT_OPERATE o 
+		left join RIGHT_ROLE_OPERATE ro on o.OP_ID = ro.OP_ID
+		left join RIGHT_ROLE r on ro.ROLE_ID = r.ROLE_ID
+		WHERE r.ROLE_ID = #{roleId} 
+	</select>
+	
+	<!-- 根据角色ID查询组 -->
+	<select id="queryGroupByRoleID" parameterType="int" resultMap="com.mopon.dao.master.member.IGroupDao.groupResultMap">
+		SELECT g.* FROM RIGHT_GROUP g
+		left join RIGHT_GROUP_ROLE gr on g.GROUP_ID = gr.GROUP_ID
+		left join RIGHT_ROLE r on gr.ROLE_ID = r.ROLE_ID
+		WHERE r.ROLE_ID = #{roleId} 
+	</select>	
+	
+	<!-- 根据组ID查询角色-->
+	<select id="queryRoleByGroupID" parameterType="int" resultMap="roleResultMap">
+		SELECT r.* FROM RIGHT_ROLE r
+		left join RIGHT_GROUP_ROLE gr on r.ROLE_ID = gr.ROLE_ID
+		left join RIGHT_GROUP g on gr.GROUP_ID = g.GROUP_ID
+		WHERE g.GROUP_ID = #{groupId} 
+	</select>	
+	
+	<!-- 根据菜单ID查询角色-->
+	<select id="queryRoleByMenuID" parameterType="int" resultMap="roleResultMap">
+		SELECT r.* FROM RIGHT_ROLE r
+		left join RIGHT_ROLE_MENUITEM rm on r.ROLE_ID = rm.ROLE_ID
+		left join RIGHT_MENUITEM m on rm.MENU_ID = m.MENU_ID
+		WHERE m.MENU_ID = #{menuId} 
+	</select>	
+	
+	
+	<select id="queryRoleByParent" resultMap="roleResultMap">
+		SELECT * FROM RIGHT_ROLE WHERE PARENT_ROLE_ID = 0	
+	</select>
+	
+	<select id="queryRoleBySub" resultMap="roleResultMap">
+		SELECT * FROM RIGHT_ROLE WHERE PARENT_ROLE_ID != 0	
+	</select>
+	
+</mapper>

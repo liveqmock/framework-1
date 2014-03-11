@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mopon.dao.master.logs.ILoggingDao" >
+  <resultMap id="BaseResultMap" type="Logging" >
+    <id column="LOG_ID" property="logId" jdbcType="BIGINT" />
+    <result column="LOG_UID" property="logUid" jdbcType="BIGINT" />
+    <result column="LOG_NAME" property="logName" jdbcType="VARCHAR" />
+    <result column="LOG_MOBILE" property="logMobile" jdbcType="VARCHAR" />
+    <result column="LOG_IP" property="logIp" jdbcType="VARCHAR" />
+    <result column="LOG_DATE" property="logDate" jdbcType="TIMESTAMP" />
+    <result column="LOG_SITE_ID" property="logSiteId" jdbcType="INTEGER" />
+    <result column="LOG_SITE_NAME" property="logSiteName" jdbcType="VARCHAR" />
+    <result column="LOG_CLIENT_TYPE" property="logClientType" jdbcType="INTEGER" />
+    <result column="LOG_INFO" property="logInfo" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    LOG_ID, LOG_UID, LOG_NAME, LOG_MOBILE, LOG_IP, LOG_DATE, LOG_SITE_ID, LOG_SITE_NAME, 
+    LOG_CLIENT_TYPE,LOG_INFO
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from COMMON_MEMBER_LOGIN
+    where LOG_ID = #{logId,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from COMMON_MEMBER_LOGIN
+    where LOG_ID = #{logId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="Logging" >
+    insert into COMMON_MEMBER_LOGIN (LOG_ID, LOG_UID, LOG_NAME, 
+      LOG_MOBILE, LOG_IP, LOG_DATE, 
+      LOG_SITE_ID, LOG_SITE_NAME, LOG_CLIENT_TYPE,LOG_INFO
+      )
+    values (#{logId,jdbcType=BIGINT}, #{logUid,jdbcType=BIGINT}, #{logName,jdbcType=VARCHAR}, 
+      #{logMobile,jdbcType=VARCHAR}, #{logIp,jdbcType=VARCHAR}, #{logDate,jdbcType=TIMESTAMP}, 
+      #{logSiteId,jdbcType=INTEGER}, #{logSiteName,jdbcType=VARCHAR}, #{logClientType,jdbcType=INTEGER},
+      #{logInfo,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="Logging" >
+    insert into COMMON_MEMBER_LOGIN
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="logId != null" >
+        LOG_ID,
+      </if>
+      <if test="logUid != null" >
+        LOG_UID,
+      </if>
+      <if test="logName != null" >
+        LOG_NAME,
+      </if>
+      <if test="logMobile != null" >
+        LOG_MOBILE,
+      </if>
+      <if test="logIp != null" >
+        LOG_IP,
+      </if>
+      <if test="logDate != null" >
+        LOG_DATE,
+      </if>
+      <if test="logSiteId != null" >
+        LOG_SITE_ID,
+      </if>
+      <if test="logSiteName != null" >
+        LOG_SITE_NAME,
+      </if>
+      <if test="logClientType != null" >
+        LOG_CLIENT_TYPE,
+      </if>
+      <if test="logInfo != null" >
+        LOG_INFO,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="logId != null" >
+        #{logId,jdbcType=BIGINT},
+      </if>
+      <if test="logUid != null" >
+        #{logUid,jdbcType=BIGINT},
+      </if>
+      <if test="logName != null" >
+        #{logName,jdbcType=VARCHAR},
+      </if>
+      <if test="logMobile != null" >
+        #{logMobile,jdbcType=VARCHAR},
+      </if>
+      <if test="logIp != null" >
+        #{logIp,jdbcType=VARCHAR},
+      </if>
+      <if test="logDate != null" >
+        #{logDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="logSiteId != null" >
+        #{logSiteId,jdbcType=INTEGER},
+      </if>
+      <if test="logSiteName != null" >
+        #{logSiteName,jdbcType=VARCHAR},
+      </if>
+      <if test="logClientType != null" >
+        #{logClientType,jdbcType=INTEGER},
+      </if>
+      <if test="logInfo != null" >
+        #{logInfo,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+ 
+  <insert id="saveBatch" parameterType="java.util.List">
+		INSERT INTO COMMON_MEMBER_LOGIN
+			(
+			LOG_UID,
+			LOG_NAME,
+			LOG_MOBILE,
+			LOG_IP,
+			LOG_DATE,
+			LOG_SITE_ID,
+			LOG_SITE_NAME,
+			LOG_CLIENT_TYPE,
+			LOG_INFO)
+			VALUES
+			<foreach collection="list" item="item" index="index"  separator=","> 
+				(#{item.logUid},#{item.logName},#{item.logMobile},#{item.logIp},{item.logDate},#{item.logSiteId},#{item.logSiteName},#{item.logClientType,#{item.logInfo})
+			</foreach>
+	</insert>
+	<select id="getLoggingCount" parameterType="Logging" resultType="int">
+		SELECT COUNT(LOG_UID) FROM COMMON_MEMBER_LOGIN WHERE 1=1
+   		<if test="entity.logName != null and entity.logName !=''">
+   			AND LOG_NAME LIKE CONCAT('%',#{entity.logName},'%')
+   		</if>
+   		<if test="entity.logSiteName != null and entity.logSiteName !=''">
+   			AND LOG_SITE_NAME LIKE CONCAT('%',#{entity.logSiteName},'%')
+   		</if>
+   		<if test="entity.logInfo != null and entity.logInfo !=''">
+   			AND LOG_INFO LIKE CONCAT('%',#{entity.logInfo},'%')
+   		</if>
+   		<if test="entity.logIp != null and entity.logIp !=''">
+   			AND LOG_IP = #{entity.logIp}
+   		</if>
+   		<if test="startDate != null and startDate !=''">
+   			AND LOG_DATE &gt; #{startDate}
+   		</if>
+   		<if test="endDate != null and endDate !=''">
+   			AND LOG_DATE &lt; #{endDate}
+   		</if>
+	</select>
+	<select id="queryLoggingForList" parameterType="Logging" resultMap="BaseResultMap">
+		SELECT <include refid="Base_Column_List" /> FROM COMMON_MEMBER_LOGIN WHERE 1=1
+   		<if test="entity.logName != null and entity.logName !=''">
+   			AND LOG_NAME LIKE CONCAT('%',#{entity.logName},'%')
+   		</if>
+   		<if test="entity.logSiteName != null and entity.logSiteName !=''">
+   			AND LOG_SITE_NAME LIKE CONCAT('%',#{entity.logSiteName},'%')
+   		</if>
+   		<if test="entity.logInfo != null and entity.logInfo !=''">
+   			AND LOG_INFO LIKE CONCAT('%',#{entity.logInfo},'%')
+   		</if>
+   		<if test="entity.logIp != null and entity.logIp !=''">
+   			AND LOG_IP = #{entity.logIp}
+   		</if>
+   		<if test="startDate != null and startDate !=''">
+   			AND LOG_DATE &gt; #{startDate}
+   		</if>
+   		<if test="endDate != null and endDate !=''">
+   			AND LOG_DATE &lt; #{endDate}
+   		</if>
+   		LIMIT #{pageNO,jdbcType=INTEGER}, #{pageCount,jdbcType=INTEGER}
+	</select>
+</mapper>

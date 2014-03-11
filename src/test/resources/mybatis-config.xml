@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>      
+<!DOCTYPE configuration      
+    PUBLIC "-//mybatis.org//DTD Config 3.0//EN"      
+     "http://mybatis.org/dtd/mybatis-3-config.dtd">  
+<configuration>  
+  
+    <!-- 定义实体类的别名 -->  
+    <typeAliases>  
+        <typeAlias type="com.mopon.entity.member.Member" alias="Member" />   
+        <typeAlias type="com.mopon.entity.member.Menu" alias="Menu" /> 
+        <typeAlias type="com.mopon.entity.member.MenuItem" alias="MenuItem" /> 
+        <typeAlias type="com.mopon.entity.sys.Config" alias="Config" /> 
+        <typeAlias type="com.mopon.entity.sys.Table" alias="Table" /> 
+        <typeAlias type="com.mopon.entity.sys.TableRule" alias="TableRule" /> 
+        <typeAlias type="com.mopon.entity.member.Group" alias="Group" />
+        <typeAlias type="com.mopon.entity.member.Operate" alias="Operate" />
+        <typeAlias type="com.mopon.entity.member.GroupRole" alias="GroupRole" />
+        <typeAlias type="com.mopon.entity.member.Role" alias="Role" />
+        <typeAlias type="com.mopon.entity.member.RoleMenu" alias="RoleMenu" />
+        <typeAlias type="com.mopon.entity.member.RoleOperate" alias="RoleOperate" />
+        <typeAlias type="com.mopon.entity.member.GroupRole" alias="GroupRole"/>
+    </typeAliases>  
+  
+    <!-- 定义映射资源 -->  
+    <!-- <mappers>  
+        <mapper resource="com/mopon/dao/adminMapper.xml" />  
+        <mapper resource="com/mopon/dao/errorMsgMapper.xml" /> 
+    </mappers>   -->
+  
+</configuration> 

@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mopon.dao.master.member.IMenuItemDao">
+
+	<resultMap type="MenuItem" id="menuItemResultMap">
+		<id property="menuId" column="MENU_ID" />
+		<result property="menuName" column="MENU_NAME" />
+		<result property="menuWName" column="MENU_W_NAME" />
+		<result property="menuAction" column="MENU_ACTION" />
+		<result property="createUser" column="CREATE_USER" />
+		<result property="createDate" column="CREATE_DATE" />
+		<result property="menuIconcls" column="MENU_ICON_CLS" />
+		<result property="menuSmallcls" column="MENU_SMALL_CLS" />
+		<result property="menuPriority" column="MENU_PRIORITY" />
+		<result property="menuStatus" column="MENU_STATUS" />
+		<result property="menuStartMenu" column="MENU_STARTMENU" />
+		<result property="menuQuickMenu" column="MENU_QUICKMENU" />
+		<result property="mainMenuId" column="MAIN_MENU_ID" />
+		<result property="menuUrl" column="MENU_URL" />
+	</resultMap>
+	
+	<resultMap type="MenuItem" id="menuResultMap" extends="menuItemResultMap">
+		<collection property="menuItem" ofType="MenuItem" column="MAIN_MENU_ID">
+		<id property="menuId" column="MMENU_ID" />
+		<result property="menuName" column="MMENU_NAME" />
+		</collection>
+	</resultMap>
+	
+	<!-- 复用sql语句 查询菜单表所有字段 -->
+	<sql id="selectAllField">
+		SELECT
+			MENU_ID, MENU_NAME,MENU_W_NAME,MENU_ACTION, CREATE_USER,CREATE_DATE,MENU_ICON_CLS,
+			MENU_SMALL_CLS,MENU_PRIORITY,MENU_STATUS, MENU_STARTMENU,MENU_QUICKMENU,MAIN_MENU_ID,MENU_URL
+		FROM
+		RIGHT_MENUITEM
+	</sql>
+	
+	<!-- 复用sql语句 查询菜单表所有字段 -->
+	<sql id="selectField">
+			MENU_ID, MENU_NAME,MENU_W_NAME,MENU_ACTION, CREATE_USER,CREATE_DATE,MENU_ICON_CLS,
+			MENU_SMALL_CLS,MENU_PRIORITY,MENU_STATUS, MENU_STARTMENU,MENU_QUICKMENU,MAIN_MENU_ID,MENU_URL
+	</sql>
+
+	<!-- 添加返回添加成功的主键Id -->
+	<insert id="save" parameterType="MenuItem" useGeneratedKeys="true" keyProperty="menuId">
+		INSERT INTO RIGHT_MENUITEM
+		(
+			MENU_NAME,MENU_W_NAME,MENU_ACTION, CREATE_USER,CREATE_DATE,MENU_ICON_CLS,
+			MENU_SMALL_CLS,MENU_PRIORITY,MENU_STATUS, MENU_STARTMENU,MENU_QUICKMENU,MAIN_MENU_ID,MENU_URL
+		)
+		VALUES
+		(
+			#{menuName},	#{menuWName},#{menuAction},#{createUser}, #{createDate}, #{menuIconcls},#{menuSmallcls},
+			#{menuPriority},	#{menuStatus}, #{menuStartMenu},#{menuQuickMenu},#{mainMenuId},#{menuUrl}
+		)
+	</insert>
+
+	<!-- 添加菜单角色关联 -->
+	<insert id="saveMenuRole" parameterType="MenuItem">
+		INSERT INTO RIGHT_ROLE_MENUITEM (ROLE_ID, MENU_ID) VALUES (#{roleId},#{menuId} )
+	</insert>
+
+	<!-- 根据ID删除 -->
+	<delete id="deleteById" parameterType="MenuItem">
+		DELETE FROM
+		RIGHT_MENUITEM
+		WHERE MENU_ID = #{menuId}
+	</delete>
+	
+    <!-- 根据菜单Id删除角色菜单关联 -->
+	<delete id="delMenuRoleByMenuId" >
+		DELETE FROM
+		RIGHT_ROLE_MENUITEM
+		WHERE MENU_ID = #{menuId}
+	</delete>
+	
+	 <!-- 根据菜单Id和角色Id删除角色菜单关联 -->
+	<delete id="delMenuRole" >
+		DELETE FROM
+		RIGHT_ROLE_MENUITEM
+		WHERE MENU_ID = #{menuId} and ROLE_ID = #{roleId}
+	</delete>
+			
+	<!-- 更新 -->
+	<update id="update" parameterType="MenuItem">
+		UPDATE RIGHT_MENUITEM SET
+		MENU_NAME = #{menuName}, 
+		MENU_W_NAME=#{menuWName},
+		MENU_ACTION = #{menuAction},
+		MENU_ICON_CLS = #{menuIconcls},
+		MENU_SMALL_CLS = #{menuSmallcls},
+		MENU_PRIORITY = #{menuPriority},
+		MENU_STATUS = #{menuStatus},
+		MENU_STARTMENU = #{menuStartMenu},
+		MENU_QUICKMENU = #{menuQuickMenu},
+		MAIN_MENU_ID = #{mainMenuId},
+		MENU_URL=#{menuUrl}
+		WHERE MENU_ID = #{menuId}
+	</update>
+
+	<!-- 根据ID查询 -->
+	<select id="queryById" resultMap="menuItemResultMap">
+		<include refid="selectAllField" />
+		WHERE
+		MENU_ID = #{menuId}
+	</select>
+
+	<!-- 查询总数 -->
+	<select id="queryForCount" parameterType="MenuItem"
+		resultType="int">
+		SELECT
+		COUNT(MENU_ID)
+		FROM RIGHT_MENUITEM		
+		WHERE MENU_ID IN(SELECT DISTINCT MENU_ID FROM RIGHT_ROLE_MENUITEM WHERE ROLE_ID=#{roleId})
+		<if test="menuName != null and menuName !=''"> AND MENU_NAME like CONCAT('%',#{menuName},'%' )  </if>
+		<if test="createUser != null and createUser !=''"> AND CREATE_USER like CONCAT('%',#{createUser},'%' ) </if>
+		<if test="menuStatus != null and menuStatus !=-1"> AND MENU_STATUS = #{menuStatus} </if>
+		<if test="menuWName != null and menuWName !=''"> AND MENU_W_NAME = #{menuWName} </if>
+		<if test="startDate != null  and startDate !=''"> AND CREATE_DATE >= #{startDate} </if>
+		<if test="endDate != null  and endDate !=''"> AND CREATE_DATE  &lt; #{endDate} </if>
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="queryForPages" parameterType="MenuItem"
+		resultMap="menuResultMap">
+		SELECT
+			M.MENU_ID, M.MENU_NAME,M.MENU_W_NAME,M.MENU_ACTION, M.CREATE_USER,M.CREATE_DATE,M.MENU_ICON_CLS,
+			M.MENU_SMALL_CLS,M.MENU_PRIORITY,M.MENU_STATUS,M.MENU_STARTMENU,M.MENU_QUICKMENU,M.MAIN_MENU_ID,
+			M.MENU_URL,MAIN.MENU_ID 'MMENU_ID',MAIN.MENU_NAME 'MMENU_NAME'
+		FROM
+		RIGHT_MENUITEM AS M
+		LEFT JOIN RIGHT_MENUITEM AS MAIN ON MAIN.MENU_ID=M.MAIN_MENU_ID
+		WHERE M.MENU_ID IN(SELECT DISTINCT MENU_ID FROM RIGHT_ROLE_MENUITEM WHERE ROLE_ID=#{entity.roleId})
+		<if test="entity.menuName != null and entity.menuName !=''"> AND M.MENU_NAME like CONCAT('%',#{entity.menuName},'%' )  </if>
+		<if test="entity.createUser != null and entity.createUser !=''"> AND M.CREATE_USER like CONCAT('%',#{entity.createUser},'%' ) </if>
+		<if test="entity.menuStatus != null and entity.menuStatus !=-1"> AND M.MENU_STATUS = #{entity.menuStatus} </if>
+		<if test="entity.menuWName != null and entity.menuWName !=''"> AND MENU_W_NAME = #{entity.menuWName} </if>
+		<if test="entity.startDate != null  and entity.startDate !=''"> AND M.CREATE_DATE >= #{entity.startDate} </if>
+		<if test="entity.endDate != null  and entity.endDate !=''"> AND M.CREATE_DATE  &lt; #{entity.endDate} </if>
+		ORDER BY M.MENU_ID DESC
+		LIMIT #{start,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+	</select>
+	
+	<!-- 查询总数Admin -->
+	<select id="queryForCountAdmin" parameterType="MenuItem"
+		resultType="int">
+		SELECT
+		COUNT(MENU_ID)
+		FROM RIGHT_MENUITEM		
+		WHERE 1=1
+		<if test="menuName != null and menuName !=''"> AND MENU_NAME like CONCAT('%',#{menuName},'%' )  </if>
+		<if test="createUser != null and createUser !=''"> AND CREATE_USER like CONCAT('%',#{createUser},'%' ) </if>
+		<if test="menuStatus != null and menuStatus !=-1"> AND MENU_STATUS = #{menuStatus} </if>
+		<if test="menuWName != null and menuWName !=''"> AND MENU_W_NAME = #{menuWName} </if>
+		<if test="startDate != null  and startDate !=''"> AND CREATE_DATE >= #{startDate} </if>
+		<if test="endDate != null  and endDate !=''"> AND CREATE_DATE  &lt; #{endDate} </if>
+	</select>
+		
+	<!-- 分页查询Admin -->
+	<select id="queryForPagesAdmin" parameterType="MenuItem"
+		resultMap="menuResultMap">
+		SELECT
+			M.MENU_ID, M.MENU_NAME,M.MENU_W_NAME,M.MENU_ACTION, M.CREATE_USER,M.CREATE_DATE,M.MENU_ICON_CLS,
+			M.MENU_SMALL_CLS,M.MENU_PRIORITY,M.MENU_STATUS,M.MENU_STARTMENU,M.MENU_QUICKMENU,M.MAIN_MENU_ID,
+			M.MENU_URL,MAIN.MENU_ID 'MMENU_ID',MAIN.MENU_NAME 'MMENU_NAME'
+		FROM
+		RIGHT_MENUITEM AS M
+		LEFT JOIN RIGHT_MENUITEM AS MAIN ON MAIN.MENU_ID=M.MAIN_MENU_ID
+		WHERE 1=1
+		<if test="entity.menuName != null and entity.menuName !=''"> AND M.MENU_NAME like CONCAT('%',#{entity.menuName},'%' )  </if>
+		<if test="entity.createUser != null and entity.createUser !=''"> AND M.CREATE_USER like CONCAT('%',#{entity.createUser},'%' ) </if>
+		<if test="entity.menuStatus != null and entity.menuStatus !=-1"> AND M.MENU_STATUS = #{entity.menuStatus} </if>
+		<if test="entity.startDate != null  and entity.startDate !=''"> AND M.CREATE_DATE >= #{entity.startDate} </if>
+		<if test="entity.menuWName != null and entity.menuWName !=''"> AND MENU_W_NAME = #{entity.menuWName} </if>
+		<if test="entity.endDate != null  and entity.endDate !=''"> AND M.CREATE_DATE  &lt; #{entity.endDate} </if>
+		 ORDER BY M.MENU_ID DESC LIMIT #{start,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+	</select>
+	
+	<!-- 查询全部 -->
+	<select id="queryAllMenuItem" parameterType="java.util.HashMap"
+		resultMap="menuItemResultMap">
+		<include refid="selectAllField" />
+	</select>
+	
+
+	<!-- 根据菜单ID查询子菜单列表 -->
+	<select id="queryMenuItemByMainMenuId" parameterType="Integer"
+		resultMap="menuItemResultMap">
+		<include refid="selectAllField" />
+		WHERE MAIN_MENU_ID = #{mainMenuId}
+	</select>
+
+	<!-- 根据用户ID查询对应的菜单列表 -->
+	<select id="queryManMenuByUser" parameterType="java.util.HashMap"
+		resultMap="menuItemResultMap">
+		<include refid="selectAllField" />
+		WHERE MENU_STATUS='1'  AND MENU_ID IN (
+		SELECT R.MENU_ID
+		FROM COMMON_MEMBER U,RIGHT_ROLE_MENUITEM R
+		WHERE U.ROLE_ID = R.ROLE_ID AND
+		U.UID = #{userId}
+		)
+	</select>
+	
+	<!-- 根据用户ID查询对应的菜单列表(超级用户) -->
+	<select id="queryManMenuByAdmin" parameterType="java.util.HashMap"
+		resultMap="menuItemResultMap">
+		<include refid="selectAllField" />
+		WHERE MENU_STATUS='1'
+	</select>
+
+	<!-- 提供新增和修改界面下拉框的数据源，查询所有父菜单的id和name -->
+	<select id="queryMainMenuList" parameterType="MenuItem"
+		resultMap="menuItemResultMap">
+		SELECT MENU_ID, MENU_NAME FROM RIGHT_MENUITEM WHERE MENU_ID
+		NOT IN (SELECT DISTINCT OP_MENUID FROM RIGHT_OPERATE WHERE OP_MENUID IS NOT NULL)
+	</select>
+
+	<!--查询指定父菜单ID的菜单记录条数  -->
+	<select id="queryCountByMainMenuId"  parameterType="Integer" resultType="Integer">
+		SELECT COUNT(MENU_ID) FROM RIGHT_MENUITEM WHERE MAIN_MENU_ID=#{parentMenuId}
+	</select>
+	
+		<!--查询子菜单（操作管理菜单下拉框）-->
+	<select id="querySubmenu" resultMap="menuItemResultMap" parameterType="Integer">
+		SELECT 
+		M.MENU_ID, M.MENU_NAME
+		FROM  RIGHT_MENUITEM M
+		LEFT JOIN RIGHT_ROLE_MENUITEM RM ON RM.MENU_ID=M.MENU_ID
+		WHERE RM.ROLE_ID=#{roleId} AND M.MENU_ID NOT IN (SELECT DISTINCT MAIN_MENU_ID FROM RIGHT_MENUITEM WHERE MAIN_MENU_ID  IS NOT NULL)
+	</select>
+	
+</mapper>

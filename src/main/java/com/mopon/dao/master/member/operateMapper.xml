@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mopon.dao.master.member.IOperateDao">
+
+	<!-- 操作实体的映射配置 -->
+	<resultMap type="Operate" id="operateResultMap">
+		<id property="opId" column="OP_ID" />
+		<result property="opName" column="OP_NAME" />
+		<result property="createUser" column="CREATE_USER" />
+		<result property="createDate" column="CREATE_DATE" />
+		<result property="opAction" column="OP_ACTION" />
+		<result property="opIsBtn" column="OP_IS_BTN" />
+		<result property="opDesc" column="OP_DESC" />
+		<result property="opMenuId" column="OP_MENUID" />
+		<result property="opUrl" column="OP_URL" />
+		<result property="opPriority" column="OP_SORT" />
+	</resultMap>
+	
+	<resultMap type="Operate" id="operateMenuItemResultMap" extends="operateResultMap">
+		<collection property="menuItem" ofType="MenuItem" column="OP_ID">
+		<id property="menuId" column="MENU_ID" />
+		<result property="menuName" column="MENU_NAME" />
+		</collection>
+	</resultMap>
+	
+	<!-- 根据菜单ID和操作ID进行关联 -->
+	<insert id="updateOpMenuId">
+			UPDATE RIGHT_OPERATE SET OP_MENUID=#{menuId}  WHERE OP_ID IN
+		<foreach collection="opIds" index="index" item="opId" open="(" separator="," close=")">  
+			#{opId}  
+		</foreach>
+	</insert>
+	
+	<!-- 根据菜单ID清除操作表的菜单ID （废弃）-->
+	<delete id="clearOpMenuId" parameterType="Operate"  >
+			DELETE FROM RIGHT_OPERATE
+		<where>
+	           OP_MENUID=#{menuId} AND OP_ID  NOT IN
+		<foreach collection="opIds" index="index" item="opId" open="(" separator="," close=")">  
+			#{opId}  
+		</foreach>
+	    </where>
+	</delete>
+	
+	<!-- 新增操作 -->
+	<insert id="save" parameterType="Operate" useGeneratedKeys="true" keyProperty="opId">
+<!-- 		#{btnId} -->
+		INSERT INTO RIGHT_OPERATE (OP_NAME, CREATE_USER, CREATE_DATE, OP_ACTION,OP_IS_BTN, OP_DESC,OP_MENUID,OP_URL,OP_SORT) VALUES(#{opName}, #{createUser}, #{createDate}, #{opAction},#{opIsBtn},#{opDesc},#{opMenuId},#{opUrl},#{opPriority})
+	</insert>
+	
+	<!-- 根据操作ID删除操作 -->
+	<delete id="removeByOpId" parameterType="Operate">
+		DELETE FROM RIGHT_OPERATE
+		<where>
+	            OP_ID = #{opId}
+	    </where>
+	</delete>
+	
+	<!-- 根据菜单ID删除操作 -->
+	<delete id="removeByMenuID" parameterType="int">
+		DELETE FROM RIGHT_OPERATE 
+		<where>
+	    	OP_MENUID = #{menuId}  
+	    </where>
+	</delete>
+	
+	<!-- 根据菜单ID删除角色操作关联表 -->
+	<delete id="removeRoleOperate" parameterType="Operate">
+		DELETE FROM RIGHT_ROLE_OPERATE WHERE OP_ID in (SELECT OP_ID FROM RIGHT_OPERATE WHERE OP_MENUID=#{menuId})
+	</delete>
+	
+	<!--查询关联的条数 -->
+	<select id="queryRoleOperate" parameterType="Operate" resultType="Integer">
+		SELECT COUNT(ID) FROM RIGHT_ROLE_OPERATE 
+		WHERE OP_ID =#{opId} and ROLE_ID=#{roleId}
+	</select>
+	
+	
+	
+	<!--根据操作Id删除角色操作表 -->
+	<delete id="removeRoleOperateByOpId" parameterType="Operate">
+		DELETE FROM RIGHT_ROLE_OPERATE WHERE  OP_ID =#{opId}
+	</delete>
+	
+	<!-- 新增角色操作关联 -->
+	<insert id="saveRoleOperate" parameterType="Operate">
+		INSERT INTO RIGHT_ROLE_OPERATE (ROLE_ID,OP_ID) VALUES(#{roleId},#{opId})
+	</insert>
+	
+	
+		<!-- 根据菜单ID和角色Id删除角色操作关联表 -->
+	<delete id="removeRoleOperateByMenuId" parameterType="Integer">
+		DELETE FROM RIGHT_ROLE_OPERATE WHERE OP_ID  IN ( SELECT OP_ID FROM RIGHT_OPERATE WHERE OP_MENUID=#{menuId})
+	</delete>
+	
+	<!-- 根据操作ID的集合删除角色操作关联表 -->
+	<delete id="removeRoleOperateByInteger">
+		DELETE FROM RIGHT_ROLE_OPERATE WHERE OP_ID IN
+		<foreach collection="list" index="index" item="opIds" open="(" separator="," close=")">  
+			#{opIds}  
+		</foreach> 
+	</delete>
+	
+	<!-- 根据操作ID的集合删除对应的操作集合 -->
+	<delete id="removeOperateByInteger">
+		DELETE FROM RIGHT_OPERATE WHERE OP_ID IN
+		<foreach collection="list" index="index" item="opIds" open="(" separator="," close=")">  
+			#{opIds}  
+		</foreach> 
+	</delete>
+		
+	<!-- 根据操作ID修改操作 -->
+	<update id="update" parameterType="Operate">
+		UPDATE RIGHT_OPERATE
+		<set>
+	            OP_NAME = #{opName},  
+	            OP_DESC = #{opDesc},  
+	            OP_IS_BTN=#{opIsBtn},
+	            OP_ACTION=#{opAction},
+	            OP_MENUID=#{opMenuId},
+	            OP_URL=#{opUrl},
+	            OP_SORT=#{opPriority}
+   		</set> 
+   		<where>
+	            OP_ID = #{opId}  
+	    </where>
+	</update>
+	
+	<!-- 根据操作Id查询操作 -->
+	<select id="findOperateById"  parameterType="Integer" resultMap="operateResultMap">
+		SELECT OP_ID,OP_NAME,OP_ACTION,OP_IS_BTN,OP_DESC,OP_MENUID,OP_URL,OP_SORT FROM RIGHT_OPERATE WHERE OP_ID=#{opId}
+	</select>
+	
+	<!-- 查询的条数 -->
+	<select id="queryOperateForCount"  parameterType="Operate" resultType="Integer">
+		SELECT COUNT(OP.OP_ID) FROM RIGHT_OPERATE OP
+		<where>
+			<if test="roleId!=null">  
+	            OP_ID in (SELECT DISTINCT OP_ID FROM RIGHT_ROLE_OPERATE WHERE ROLE_ID=#{roleId}) 
+	        </if> 
+		    <if test="opMenuId!=null and opMenuId != 0">  
+	            AND OP_MENUID = #{opMenuId}
+	        </if> 
+	         <if test="opName != null and opName !=''" >  
+	            AND OP_NAME LIKE CONCAT('%',#{opName},'%' ) 
+	        </if> 
+	        <if test="opAction != null and opAction !=''" >  
+	            AND OP_ACTION =#{opAction}
+	        </if> 
+	         <if test="opDesc != null and opDesc !=''" >
+	          	 AND OP_DESC LIKE CONCAT('%',#{opDesc},'%' ) 
+	        </if> 
+	        <if test="startDate != null  and startDate !=''" >
+	        	AND CREATE_DATE >= #{startDate}
+	        </if>
+	        <if test="endDate != null  and endDate !=''" >
+	        	AND CREATE_DATE &lt;= #{startDate}
+	        </if>
+	        <if test="createUser != null and createUser !=''">
+	        	 AND CREATE_USER LIKE CONCAT('%',#{createUser},'%' ) 
+	        </if>
+	    </where>
+	</select>
+	
+	<!-- 	分页查询操作 -->
+	<select id="queryOperateForPages"  parameterType="Operate" resultMap="operateMenuItemResultMap">
+		SELECT OP.OP_ID,OP.OP_NAME,OP.CREATE_USER,OP.CREATE_DATE,OP.OP_ACTION,OP.OP_IS_BTN,OP.OP_DESC,OP.OP_MENUID,OP.OP_URL,OP.OP_SORT,ME.MENU_NAME FROM RIGHT_OPERATE OP 
+		LEFT JOIN  RIGHT_MENUITEM ME ON ME.MENU_ID=OP.OP_MENUID
+		<where>
+		     <if test="entity.roleId!=null">  
+	            OP.OP_ID in (SELECT DISTINCT OP_ID FROM RIGHT_ROLE_OPERATE WHERE ROLE_ID=#{entity.roleId}) 
+	        </if> 
+		
+		    <if test="entity.opMenuId!=null and entity.opMenuId != 0">  
+	            AND OP.OP_MENUID = #{entity.opMenuId}
+	        </if> 
+	         <if test="entity.opName != null and entity.opName !=''" >  
+	            AND OP.OP_NAME LIKE CONCAT('%',#{entity.opName},'%' ) 
+	        </if> 
+	        <if test="entity.opAction != null and entity.opAction !=''" >  
+	            AND OP_ACTION =#{entity.opAction}
+	        </if> 
+	         <if test="entity.opDesc != null and entity.opDesc !=''" >
+	          	 AND OP.OP_DESC LIKE CONCAT('%',#{entity.opDesc},'%' ) 
+	        </if> 
+	        <if test="entity.startDate != null  and entity.startDate !=''" >
+	        	AND OP.CREATE_DATE >= #{entity.startDate}
+	        </if>
+	        <if test="entity.endDate != null  and entity.endDate !=''" >
+	        	AND OP.CREATE_DATE &lt;= #{entity.endDate}
+	        </if>
+	    </where>
+	    ORDER BY OP.OP_ID DESC
+	    LIMIT #{start,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+	</select>
+	
+	<!-- 	根据菜单id查询操作 -->
+	<select id="queryByMenuId"  parameterType="Integer" resultMap="operateResultMap">
+		SELECT  OP_ID,OP_NAME,OP_MENUID FROM RIGHT_OPERATE WHERE OP_MENUID=#{menuId}
+	</select>
+	
+	<!-- 	根据菜单id查询对应的操作 -->
+	<select id="queryOperateByMenuId"  parameterType="Integer" resultMap="operateResultMap">
+	       SELECT OP_ID,OP_NAME,OP_ACTION,OP_IS_BTN,OP_DESC FROM RIGHT_OPERATE WHERE OP_MENUID=#{menuId}	
+	</select>
+
+	
+	<select id="getOperate"  parameterType="Integer" resultMap="operateResultMap">
+		SELECT OP_ID,OP_NAME,OP_ACTION,OP_IS_BTN,OP_DESC,OP_URL,OP_SORT FROM RIGHT_OPERATE WHERE OP_MENUID=#{menuId} AND OP_ID IN ( SELECT OP_ID FROM RIGHT_ROLE_OPERATE WHERE ROLE_ID=#{roleId} )
+	</select>
+	
+	<select id="getOperateByRoleId"  parameterType="Integer" resultMap="operateResultMap">
+		SELECT OP_ID,OP_NAME,OP_ACTION,OP_IS_BTN,OP_DESC,OP_MENUID,OP_URL,OP_SORT FROM RIGHT_OPERATE WHERE 1=1
+		<if test="roleId != null" >
+	        	AND OP_ID IN ( SELECT DISTINCT OP_ID FROM RIGHT_ROLE_OPERATE WHERE ROLE_ID=#{roleId} )
+	    </if>
+	</select>
+</mapper>

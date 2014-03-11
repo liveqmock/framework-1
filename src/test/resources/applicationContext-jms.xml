@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p" 
+	xmlns:context="http://www.springframework.org/schema/context" 
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns="http://www.springframework.org/schema/beans"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd">
+	
+	<!-- 配置JMS连接工厂 -->  
+    <bean id="connectionFactory"  
+        class="org.springframework.jms.connection.CachingConnectionFactory">  
+        <!-- Session缓存数量 -->  
+        <property name="sessionCacheSize" value="10" />  
+        <property name="targetConnectionFactory">  
+            <bean class="org.apache.activemq.ActiveMQConnectionFactory">  
+                <!-- MQ地址 -->  
+                <property name="brokerURL" value="vm://myMQ" />  
+                 <!-- 是否异步发送 -->  
+                <property name="useAsyncSend" value="true" />  
+            </bean>  
+        </property>  
+    </bean>  
+    
+	<!-- 消息目标 队列 -->  
+	<bean id="messageQueueDestination" class="org.apache.activemq.command.ActiveMQQueue">
+		<constructor-arg index="0" value="mopon.message.queue"></constructor-arg>
+	</bean>
+	 <!-- 发送消息的目的地-->  
+    <bean id="messageTopicDestination" class="org.apache.activemq.command.ActiveMQTopic">  
+        <constructor-arg index="0" value="mopon.message.topic" />  
+    </bean>  
+   
+	 <!-- 配置JMS模版 -->  
+    <bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">  
+        <property name="connectionFactory" ref="connectionFactory" />  
+        <!-- 订阅发布模式 -->  
+        <property name="pubSubDomain" value="true" />  
+        <property name="receiveTimeout" value="10000" />  
+    </bean>  
+    
+    <bean id="queueMessageProducer" class="com.mopon.jms.impl.QueueMessageProducerImpl">  
+        <property name="template" ref="jmsTemplate" />  
+        <property name="destination" ref="messageQueueDestination" />  
+    </bean>
+    
+    <bean id="queueMessageMdp" class="com.mopon.jms.impl.MessageMdp"></bean>
+    
+    <bean class="org.springframework.jms.listener.SimpleMessageListenerContainer">
+		<property name="connectionFactory" ref="connectionFactory"></property>
+		<property name="destination" ref="messageQueueDestination"></property>
+		<property name="messageListener" ref="queueMessageMdp"></property>
+	</bean> 
+    
+
+	<bean id="topicMessageProducer" class="com.mopon.jms.impl.TopicMessageProducerImpl">  
+        <property name="template" ref="jmsTemplate" />  
+        <property name="destination" ref="messageTopicDestination" />  
+    </bean>
+
+	<bean id="topicMessageMdp" class="com.mopon.jms.impl.MessageMdp"></bean>
+
+    
+    <bean class="org.springframework.jms.listener.SimpleMessageListenerContainer">
+		<property name="connectionFactory" ref="connectionFactory"></property>
+		<property name="destination" ref="messageTopicDestination"></property>
+		<property name="messageListener" ref="topicMessageMdp"></property>
+	</bean>
+
+</beans>

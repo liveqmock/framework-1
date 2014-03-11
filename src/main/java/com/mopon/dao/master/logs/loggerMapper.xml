@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mopon.dao.master.logs.ILoggerDao">
+
+	
+	<resultMap type="OperateMsg" id="operateMsgResultMap">
+		<id property="opId" column="OP_ID" />
+		<result property="opType" column="OP_TYPE" />
+		<result property="uid" column="OP_UID" />
+		<result property="name" column="OP_NAME" />
+		<result property="dateline" column="OP_DATE" />
+		<result property="siteId" column="OP_SITE_ID" />
+		<result property="siteName" column="OP_SITE" />
+		<result property="message" column="OP_INFO" />
+	</resultMap>
+
+
+	<!-- OPERATE_LOG -->
+	<insert id="saveBatch" parameterType="java.util.List">
+		INSERT INTO SYS_OPERATE_LOG
+			(
+			OP_TYPE,
+			OP_UID,
+			OP_NAME,
+			OP_DATE,
+			OP_SITE_ID,
+			OP_SITE,
+			OP_INFO)
+			VALUES
+			
+			<foreach collection="list" item="item" index="index"  separator=","> 
+				(#{item.opType},#{item.uid},#{item.name},#{item.dateline},#{item.siteId},#{item.siteName},#{item.message})
+			</foreach>
+	</insert>
+	<select id="getOperateMsgCount" parameterType="OperateMsg" resultType="int">
+		SELECT COUNT(OP_ID) FROM SYS_OPERATE_LOG WHERE 1=1
+   		<if test="entity.name != null">
+   			AND OP_NAME = #{entity.name}
+   		</if>
+   		<if test="entity.siteId != null">
+   			AND OP_SITE_ID = #{entity.siteId}
+   		</if>
+   		<if test="entity.siteName != null">
+   			AND OP_SITE = #{entity.siteName}
+   		</if>
+   		<if test="startDate != null and startDate !=''">
+   			AND OP_DATE &gt; #{startDate}
+   		</if>
+   		<if test="endDate != null and endDate !=''">
+   			AND OP_DATE &lt; #{endDate}
+   		</if>
+   		<if test="entity.message != null">
+   			AND OP_INFO LIKE CONCAT('%',#{entity.message},'%')
+   		</if>
+	</select>
+	<select id="queryOperateMsgForList" parameterType="OperateMsg" resultMap="operateMsgResultMap">
+		SELECT * FROM SYS_OPERATE_LOG WHERE 1=1
+   		<if test="entity.name != null">
+   			AND OP_NAME LIKE CONCAT('%',#{entity.name},'%')
+   		</if>
+   		<if test="entity.siteId != null">
+   			AND OP_SITE_ID = #{entity.siteId}
+   		</if>
+   		<if test="entity.siteName != null">
+   			AND OP_SITE LIKE CONCAT('%',#{entity.siteName},'%')
+   		</if>
+   		<if test="startDate != null and startDate !=''">
+   			AND OP_DATE &gt; #{startDate}
+   		</if>
+   		<if test="endDate != null and endDate !=''">
+   			AND OP_DATE &lt; #{endDate}
+   		</if>
+   		<if test="entity.message != null">
+   			AND OP_INFO LIKE CONCAT('%',#{entity.message},'%')
+   		</if>
+   		LIMIT #{pageNO,jdbcType=INTEGER}, #{pageCount,jdbcType=INTEGER}
+	</select>
+	<!-- OPERATE_LOG -->
+</mapper>

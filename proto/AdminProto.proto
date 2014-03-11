@@ -1,0 +1,8 @@
+package com.test;
+option java_package = "com.mopon.protobuf.entity";
+option java_outer_classname = "AdminBuf";
+message Admin {
+required string adminID = 1;
+optional string adminName = 2;
+optional string adminPwd = 3;
+}

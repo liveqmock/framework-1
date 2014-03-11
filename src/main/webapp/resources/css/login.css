@@ -1,0 +1,25 @@
+/* CSS Document */
+
+body{ background:url(../images/bg.jpg) top center no-repeat #003e65;}
+div,input{ outline:none;}
+
+.l_box{ position:absolute; left:50%;top:50%;width: 520px; height:526px;}
+.l_contain{ width: 520px; position:absolute; left:-165px;top:-263px;height:526px; }
+.l_contain span{display:inline-block; vertical-align:middle;}
+.logo{  width:200px; height:65px; background:url(../images/logo.png) left top no-repeat;}
+.sub_logo{ border-left:2px solid #1ca1eb; padding-left:8px; height:28px; line-height:28px; font-family:微软雅黑; font-size:17px; font-weight:normal; color:#1fadff; margin-left:5px;}
+.login_tit{ font-family:微软雅黑; font-size:32px;  border-bottom:#1ca1eb 1px solid; color:#1ca1eb; margin:20px 0 0 0;}
+.login_box{  width:380px; height:330px; margin:23px 0 0 0;}
+
+.login_box .input{ width:270px; height:50px; margin-left:30px; padding-left:60px; border:#c0e4f9 1px solid; }
+.login_box .input span{ display:inline-block; height:40px; line-height:48px; width:80px; vertical-align:middle;font-family:微软雅黑; color:#FFF; font-size:18px; float:left;}
+.login_box .input:hover{border:#fff 1px solid;}
+.login_box .input input{height:50px; width:186px; float:left; border:none; background-color:transparent; font-size:14px;}
+
+.input_1{ background:url(../images/input_username.jpg) left top no-repeat; margin-top:18px;}
+.input_2{ background: url(../images/input_password.jpg) left top no-repeat; margin-top:50px;}
+.l_context{ background-color:#1fadff; padding:20px 0 30px 0;}
+.login_btn{ height:113px; width:380px; border:none; cursor:pointer; background:url(../images/login_btn.jpg) left top no-repeat; }
+.login_btn:hover{ background:url(../images/login_btnhover.jpg) ;}
+
+

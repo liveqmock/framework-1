@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mopon.dao.master.member.IGroupDao">
+
+	
+	<resultMap type="Group" id="groupResultMap">
+		<id property="groupId" column="GROUP_ID" />
+		<result property="groupName" column="GROUP_NAME" />
+		<result property="username" column="CREATE_USER" />
+		<result property="date" column="CREATE_DATE" />
+		<result property="description" column="GROUP_DESC" />
+		<result property="groupType" column="GROUP_TYPE" />
+		<result property="parentGroupId" column="PARENT_GROUP_ID" />
+	</resultMap>
+
+	<resultMap type="Group" id="groupMemberResultMap" extends="groupResultMap">
+		<collection property="members" ofType="Member" column="GROUP_ID">
+			<id property="uid" column="UID" />
+			<result property="userName" column="USERNAME" />
+			<result property="email" column="EMAIL" />
+			<result property="mobile" column="MOBILE" />
+			<result property="password" column="PASSWORD" />
+			<result property="emailStatus" column="EMAIL_STATUS" />
+			<result property="mobileStatus" column="MOBILE_STATUS" />
+			<result property="regIP" column="REG_IP" />
+			<result property="regDate" column="REG_DATE" />
+			<result property="regSrc" column="REG_SRC" />
+			<result property="status" column="STATUS" />
+			<result property="type" column="TYPE" />
+			<result property="avatar" column="AVATAR" />
+			<result property="avatarSrc" column="AVATAR_SRC" />
+			<result property="integral" column="INTEGRAL" />
+			<result property="level" column="LEVEL" />
+		</collection>
+	</resultMap>
+	
+	<resultMap type="Group" id="groupRoleResultMap" extends="groupResultMap">
+		<collection property="roles" ofType="Role" column="GROUP_ID">
+			<id property="roleId" column="ROLE_ID" />
+			<result property="roleName" column="ROLE_NAME" />
+			<result property="createUser" column="CREATE_USER" />
+			<result property="createDate" column="CREATE_DATE" />
+			<result property="roleDsc" column="ROLE_DESC" />
+		</collection>
+	</resultMap>
+	
+	<resultMap type="Group" id="groupMemberRoleResultMap" extends="groupResultMap">
+		<collection property="members" ofType="Member" column="GROUP_ID">
+			<id property="uid" column="UID" />
+			<result property="userName" column="USERNAME" />
+			<result property="email" column="EMAIL" />
+			<result property="mobile" column="MOBILE" />
+			<result property="password" column="PASSWORD" />
+			<result property="emailStatus" column="EMAIL_STATUS" />
+			<result property="mobileStatus" column="MOBILE_STATUS" />
+			<result property="regIP" column="REG_IP" />
+			<result property="regDate" column="REG_DATE" />
+			<result property="regSrc" column="REG_SRC" />
+			<result property="status" column="STATUS" />
+			<result property="type" column="TYPE" />
+			<result property="avatar" column="AVATAR" />
+			<result property="avatarSrc" column="AVATAR_SRC" />
+			<result property="integral" column="INTEGRAL" />
+			<result property="level" column="LEVEL" />
+		</collection>
+		<collection property="roles" ofType="Role" column="GROUP_ID">
+			<id property="roleId" column="ROLE_ID" />
+			<result property="roleName" column="ROLE_NAME" />
+			<result property="createUser" column="CREATE_USER" />
+			<result property="createDate" column="CREATE_DATE" />
+			<result property="roleDsc" column="ROLE_DESC" />
+		</collection>
+	</resultMap>
+
+	<!-- GROUP -->
+	<insert id="save" parameterType="Group" useGeneratedKeys="true" keyProperty="groupId">
+		INSERT INTO RIGHT_GROUP 
+		(GROUP_NAME, CREATE_USER, CREATE_DATE, GROUP_DESC, GROUP_TYPE,PARENT_GROUP_ID) 
+		VALUES(#{groupName}, #{username}, #{date}, #{description}, #{groupType},#{parentGroupId})
+	</insert>
+	
+	
+	<delete id="update" parameterType="Group">
+		UPDATE RIGHT_GROUP SET GROUP_NAME = #{groupName}, GROUP_DESC = #{description}, GROUP_TYPE = #{groupType} WHERE GROUP_ID = #{groupId}
+	</delete>
+	
+	<delete id="remove" parameterType="Group">
+		DELETE FROM RIGHT_GROUP WHERE GROUP_ID = #{groupId}
+	</delete>
+	
+	<select id="getGroupById" parameterType="Group" resultMap="groupResultMap">
+		SELECT * FROM RIGHT_GROUP WHERE GROUP_ID = #{groupId}
+	</select>
+	
+	<select id="getGroupDetailById" parameterType="Group" resultMap="groupMemberRoleResultMap">
+		SELECT * FROM RIGHT_GROUP g LEFT JOIN COMMON_MEMBER m ON m.GROUP_ID = g.group_ID WHERE g.GROUP_ID = #{groupId};
+	</select>
+	
+	<select id="queryGroupForList" parameterType="Group" resultMap="groupResultMap">
+		SELECT * FROM RIGHT_GROUP g WHERE 1 = 1
+		<if test="groupId != null">
+   			AND GROUP_ID = #{groupId}
+   		</if>
+   		<if test="groupName != null">
+   			AND GROUP_NAME LIKE CONCAT('%',#{groupName},'%')
+   		</if>
+   		<if test="groupType != null">
+   			AND GROUP_TYPE = #{groupType}
+   		</if>
+   		<if test="parentGroupId !=null">
+   			AND PARENT_GROUP_ID = #{parentGroupId}
+   		</if>
+	</select>
+	
+	<select id="queryGroupForObject" parameterType="Group" resultMap="groupResultMap">
+		SELECT * FROM RIGHT_GROUP WHERE 1=1 
+   		<if test="groupId != null">
+   			AND GROUP_ID = #{groupId}
+   		</if>
+   		<if test="groupName != null">
+   			AND GROUP_NAME LIKE CONCAT('%',#{groupName},'%')
+   		</if>
+   		<if test="groupType != null">
+   			AND GROUP_TYPE = #{groupType}
+   		</if>
+   		<if test="parentGroupId !=null">
+   			AND PARENT_GROUP_ID = #{parentGroupId}
+   		</if>
+	</select>
+	
+	<select id="queryGroupDynamicField" parameterType="map" resultMap="groupResultMap">
+		SELECT ${fields} FROM RIGHT_GROUP WHERE 1=1
+		<if test="groupId != null">
+   			AND GROUP_ID = #{groupId}
+   		</if>
+   		<if test="groupName != null">
+   			AND GROUP_NAME LIKE CONCAT('%',#{groupName},'%')
+   		</if>
+   		<if test="groupType != null">
+   			AND GROUP_TYPE = #{groupType}
+   		</if>
+	</select>
+	
+	<select id="queryGroupForCount" parameterType="Group" resultType="int">
+		SELECT COUNT(GROUP_ID) FROM RIGHT_GROUP  WHERE 1=1
+		<if test="supGroupList !=null">
+			AND GROUP_ID IN
+			<foreach collection="supGroupList" index="index" item="g" open="(" separator="," close=")">  
+				#{g.groupId}  
+			</foreach>
+		</if>
+   		<if test="group.groupId != null">
+   			AND GROUP_ID = #{group.groupId}
+   		</if>
+   		<if test="group.groupName != null and group.groupName !=''">
+   			AND GROUP_NAME LIKE CONCAT('%',#{group.groupName},'%')
+   		</if>
+   		<if test="group.groupType != null">
+   			AND GROUP_TYPE = #{group.groupType}
+   		</if>
+	</select>
+	
+	<select id="queryGroupForPages" parameterType="Group" resultMap="groupResultMap">
+		SELECT * FROM RIGHT_GROUP WHERE 1=1 
+		<if test="supGroupList !=null">
+			AND GROUP_ID IN
+			<foreach collection="supGroupList" index="index" item="g" open="(" separator="," close=")">  
+				#{g.groupId}  
+			</foreach>
+		</if>	
+		<if test="group.groupId != null">
+   			AND GROUP_ID = #{group.groupId}
+   		</if>
+   		<if test="group.groupName != null and group.groupName !=''">
+   			AND GROUP_NAME  LIKE CONCAT('%',#{group.groupName},'%')
+   		</if>
+   		<if test="group.groupType != null">
+   			AND GROUP_TYPE = #{group.groupType}
+   		</if>
+   		ORDER BY GROUP_ID
+   		<if test="sort == 1">
+   			DESC
+   		</if>
+   		<if test="sort == 0">
+   			ASC
+   		</if>
+   		LIMIT #{start}, #{pageSize}
+	</select>
+	<!-- GROUP -->
+	
+	<!-- GROUP MEMBER -->	
+	<select id="queryGroupMemberForList" parameterType="Group" resultMap="groupMemberResultMap">
+		SELECT * FROM RIGHT_GROUP g LEFT JOIN COMMON_MEMBER m ON g.GROUP_ID = m.GROUP_ID WHERE g.GROUP_ID = #{groupId}
+	</select>
+	<!-- GROUP MEMBER -->
+	
+	<!-- 取消用户组 -->
+	<update id="updateMemberGroup" parameterType="int" >
+		update COMMON_MEMBER set GROUP_ID = null,ROLE_ID = null where GROUP_ID = #{groupId}
+	</update>
+	
+	<!-- GROUP ROLE -->
+	<insert id="saveGroupRole" parameterType="java.util.List">
+		INSERT INTO RIGHT_GROUP_ROLE (GROUP_ID, ROLE_ID) VALUES
+		<foreach collection="list" item="item" index="index" separator=",">
+			(#{item.groupId}, #{item.roleId})
+		</foreach>	
+	</insert>
+	
+	<delete id="deleteGroupRoleByGroupId" parameterType="int">
+		DELETE FROM RIGHT_GROUP_ROLE WHERE GROUP_ID = #{groupId}
+	</delete>
+	<!-- 删除组角色关系 -->
+	<delete id="deleteGroupRole">
+		DELETE FROM RIGHT_GROUP_ROLE WHERE GROUP_ID = #{groupId} and ROLE_ID =#{roleId}
+	</delete>
+	
+	<select id="queryGroupRoleForList" parameterType="Group" resultMap="groupRoleResultMap">
+		SELECT * FROM RIGHT_GROUP g LEFT JOIN RIGHT_GROUP_ROLE go ON g.GROUP_ID = go.GROUP_ID LEFT JOIN RIGHT_ROLE ro ON go.ROLE_ID = ro.ROLE_ID WHERE g.GROUP_ID = #{groupId} 
+	</select>
+	
+	<select id="queryGroupSubordinateRole" parameterType="Group" resultMap="groupRoleResultMap">
+		SELECT * FROM RIGHT_GROUP g LEFT JOIN RIGHT_GROUP_ROLE go ON g.GROUP_ID = go.GROUP_ID LEFT JOIN RIGHT_ROLE ro ON go.ROLE_ID = ro.ROLE_ID WHERE g.GROUP_ID = #{group.groupId} and ro.PARENT_ROLE_ID=#{roleId} 
+	</select>
+	<!-- GROUP ROLE -->
+</mapper>

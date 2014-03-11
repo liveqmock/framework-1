@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mopon.dao.master.ITestDao">
+
+	<select id="saveTest" parameterType="TableRule">
+		INSERT INTO SYS_TABLE_RULE (TABLENAME, STARTDATE, INTERVALS, CURRENT_TABLE) VALUES(#{tableName}, #{startDate}, #{interval}, #{currentTableName})
+	</select>
+	
+</mapper>

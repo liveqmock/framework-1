@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mopon.dao.master.sys.IDictionaryDao" >
+  <resultMap id="BaseResultMap" type="com.mopon.entity.sys.Dictionary" >
+    <id column="CODE_TYPE" property="codeType" />
+    <id column="CODE_ID" property="codeId"  />
+    <result column="CODE_NAME" property="codeName"/>
+    <result column="SORT" property="sort" />
+    <result column="REMARK" property="remark"  />
+  </resultMap>
+  <sql id="Base_Column_List" >
+     CODE_ID, CODE_NAME, CODE_TYPE, SORT, REMARK
+  </sql>
+  
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="com.mopon.entity.sys.Dictionary" >
+    select 
+    *
+    from SYS_DICT
+    where CODE_TYPE = #{codeType}
+    order by SORT
+  </select>
+  
+  
+  <delete id="deleteByPrimaryKey" parameterType="com.mopon.entity.sys.Dictionary" >
+    delete from SYS_DICT
+    where CODE_TYPE = #{codeType,jdbcType=VARCHAR}
+      and CODE_ID = #{codeId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.mopon.entity.sys.Dictionary" >
+    insert into SYS_DICT (CODE_TYPE, CODE_ID, CODE_NAME, 
+      SORT, REMARK)
+    values (#{codeType,jdbcType=VARCHAR}, #{codeId,jdbcType=VARCHAR}, #{codeName,jdbcType=VARCHAR}, 
+      #{sort,jdbcType=INTEGER}, #{remark,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.mopon.entity.sys.Dictionary" >
+    insert into SYS_DICT
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="codeType != null" >
+        CODE_TYPE,
+      </if>
+      <if test="codeId != null" >
+        CODE_ID,
+      </if>
+      <if test="codeName != null" >
+        CODE_NAME,
+      </if>
+      <if test="sort != null" >
+        SORT,
+      </if>
+      <if test="remark != null" >
+        REMARK,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="codeType != null" >
+        #{codeType,jdbcType=VARCHAR},
+      </if>
+      <if test="codeId != null" >
+        #{codeId,jdbcType=VARCHAR},
+      </if>
+      <if test="codeName != null" >
+        #{codeName,jdbcType=VARCHAR},
+      </if>
+      <if test="sort != null" >
+        #{sort,jdbcType=INTEGER},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.mopon.entity.sys.Dictionary" >
+    update SYS_DICT
+    <set >
+      <if test="codeName != null" >
+        CODE_NAME = #{codeName,jdbcType=VARCHAR},
+      </if>
+      <if test="sort != null" >
+        SORT = #{sort,jdbcType=INTEGER},
+      </if>
+      <if test="remark != null" >
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where CODE_TYPE = #{codeType,jdbcType=VARCHAR}
+      and CODE_ID = #{codeId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.mopon.entity.sys.Dictionary" >
+    update SYS_DICT
+    set CODE_NAME = #{codeName,jdbcType=VARCHAR},
+      SORT = #{sort,jdbcType=INTEGER},
+      REMARK = #{remark,jdbcType=VARCHAR}
+    where CODE_TYPE = #{codeType,jdbcType=VARCHAR}
+      and CODE_ID = #{codeId,jdbcType=VARCHAR}
+  </update>
+</mapper>

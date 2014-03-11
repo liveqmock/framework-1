@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mopon.dao.master.member.IMemberDao">
+
+
+	<resultMap type="Member" id="memberResultMap">
+		<id property="uid" column="UID" />
+		<result property="userName" column="USERNAME" />
+		<result property="email" column="EMAIL" />
+		<result property="emailStatus" column="EMAIL_STATUS" />
+		<result property="mobile" column="MOBILE" />
+		<result property="regDate" column="REG_DATE" />
+		<result property="regIP" column="REG_IP" />
+		<result property="loginNum" column="LOGIN_NUM" />
+		<association property="role" column="ROLE_ID" javaType="Role" select="com.mopon.dao.master.member.IRoleDao.queryRoleByRoleID">
+			<id column="ROLE_ID" property="roleId"/>  
+            <result column="ROLE_NAME" property="roleName"/>  
+		</association>
+		<association property="group" column="GROUP_ID" javaType="Group" select="com.mopon.dao.master.member.IGroupDao.getGroupById">
+			<id column="GROUP_ID" property="groupId"/>  
+            <result column="GROUP_NAME" property="groupName"/>  
+		</association>
+   </resultMap>
+
+	<insert id="save" parameterType="Member">
+		INSERT INTO COMMON_MEMBER
+		(USERNAME, EMAIL, MOBILE, PASSWORD, EMAIL_STATUS,
+		MOBILE_STATUS,REG_IP,REG_DATE,REG_SRC,STATUS,TYPE,AVATAR,AVATAR_SRC,INTEGRAL,LEVEL_ID,GROUP_ID,ROLE_ID)
+		VALUES(#{userName}, #{email}, #{mobile}, #{password}, #{emailStatus},
+		#{mobileStatus},#{regIP},#{regDate},#{regSrc},#{status},#{type},#{avatar},#{avatarSrc},#{integral},#{level},#{group.groupId},#{role.roleId})
+	</insert>
+
+	<update id="update" parameterType="Member">
+		UPDATE COMMON_MEMBER 
+		<trim prefix="SET" suffixOverrides=","> 
+			<if test="password!=null and password!=''">
+				PASSWORD = #{password},
+			</if>
+			<if test="mobile!=null and mobile!=''">
+			 	MOBILE = #{mobile},
+			</if>
+			
+			<if test="email!=null and email!=''">
+			 	EMAIL = #{email},
+			</if>
+			
+			<if test="status!=null and status!=''">
+			 	STATUS = #{status},
+			</if>
+			
+			<if test="type!=null and type!=''">
+			 	TYPE = #{type},
+			</if>
+			
+			<if test="regSrc!=null and regSrc!=''">
+			 	REG_SRC = #{regSrc},
+			</if>
+			<if test="group!=null">
+				GROUP_ID = #{group.groupId},
+			</if>
+			<if test="role!=null">
+				ROLE_ID = #{role.roleId},
+			</if>
+			<if test="regIP!=null and regIP!=''">
+				REG_IP = #{regIP}, 
+			</if>
+		</trim>
+		WHERE UID = #{uid}
+	</update>
+
+	<update id="remove" parameterType="String">
+		DELETE FROM COMMON_MEMBER
+		WHERE UID in
+		<foreach collection="ids" index="index" item="item" open="(" separator="," close=")"> 
+			#{item} 
+		</foreach>
+	</update>
+
+
+	<select id="queryAll" resultMap="memberResultMap">
+		SELECT * FROM COMMON_MEMBER
+	</select>
+	
+	<select id="queryMember" resultMap="memberResultMap">
+		SELECT * FROM COMMON_MEMBER
+				where binary USERNAME = #{userName}
+				and PASSWORD = #{password}
+		
+	</select>
+	
+	<!-- 验证用户是否已经注册 -->
+	<select id="verifyMember" resultMap="memberResultMap">
+		SELECT * FROM COMMON_MEMBER
+		where 1=1
+		<if test="userName!=null">
+		and binary USERNAME = #{userName}
+		</if>
+		<if test="email!=null">
+		and EMAIL = #{email}
+		</if>
+		<if test="mobile!=null">
+		and MOBILE = #{mobile}
+		</if>
+	</select>
+	
+	
+	<select id="queryMemberById" resultMap="memberResultMap">
+		SELECT * FROM COMMON_MEMBER
+		<where>
+			<if test="uid!=null  and uid!=''">
+				and UID = #{uid}
+			</if>
+		</where>
+	</select>
+	
+		<select id="findMemberByName" resultMap="memberResultMap">
+		SELECT * FROM COMMON_MEMBER
+				where USERNAME = #{userName}
+	</select>
+	
+	<select id="queryCount" parameterType="Member" resultType="int">
+		SELECT count(UID) FROM COMMON_MEMBER		
+ 		<where>
+			<if test="member.userName!=null and member.userName!=''">
+				USERNAME  LIKE CONCAT('%',#{member.userName},'%')
+			</if>
+			<if test="groupId!=null and groupId!='' ">
+				and GROUP_ID = #{groupId}
+			</if>
+			<if test="member.regDateStart!=null and member.regDateStart!='' ">
+				and REG_DATE >= #{member.regDateStart}
+			</if>
+			<if test="member.regDateEnd!=null and member.regDateEnd!='' ">
+				 and REG_DATE &lt;= #{member.regDateEnd}
+			</if>
+			<if test="roles!=null and roles!='' ">
+				and ROLE_ID in 
+				<foreach collection="roles" index="index" item="item" open="(" separator="," close=")"> 
+					#{item.roleId} 
+				</foreach>
+			</if>
+			and TYPE=0
+		</where>
+	</select>
+
+	<select id="queryMemberForList" parameterType="Member" resultMap="memberResultMap">
+		SELECT *
+		FROM
+		COMMON_MEMBER
+		<where>
+			<if test="member.uid!=null and member.uid!='' ">
+				UID = #{member.uid}
+			</if>
+			<if test="member.userName!=null and member.userName!='' ">
+				and USERNAME  LIKE CONCAT('%',#{member.userName},'%')
+			</if>
+			<if test="member.mobile!=null and member.mobile!='' ">
+				and MOBILE LIKE CONCAT('%',#{member.mobile},'%')
+			</if>
+			<if test="member.mobileStatus!=null and member.mobileStatus!='' ">
+				and MOBILE_STATUS = #{member.mobileStatus}
+			</if>
+			<if test="groupId!=null and groupId!='' ">
+				and GROUP_ID = #{groupId}
+			</if>
+ 			<if test="member.regDateStart!=null and member.regDateStart!='' ">
+				and REG_DATE >= #{member.regDateStart}
+			</if>
+			<if test="member.regDateEnd!=null and member.regDateEnd!='' ">
+				 and REG_DATE &lt;= #{member.regDateEnd}
+			</if>
+			<if test="roles!=null and roles!='' ">
+				and ROLE_ID in 
+				<foreach collection="roles" index="index" item="item" open="(" separator="," close=")"> 
+					#{item.roleId} 
+				</foreach>
+			</if>
+			and TYPE=0
+		</where>
+		LIMIT #{pageNo, jdbcType=INTEGER} , #{pageSize,
+		jdbcType=INTEGER}
+	</select>
+	
+	<update id="changePwd" parameterType="Member">
+		UPDATE COMMON_MEMBER 
+		set PASSWORD = #{password}
+		WHERE USERNAME = #{userName}
+	</update>
+	
+	<update id="updateLoginNum" parameterType="Member">
+		UPDATE COMMON_MEMBER 
+		set LOGIN_NUM = #{loginNum}
+		WHERE UID = #{uid}
+	</update>
+
+</mapper>

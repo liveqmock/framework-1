@@ -1,0 +1,443 @@
+/*!
+* Ext JS Library 4.0
+* Copyright(c) 2006-2011 Sencha Inc.
+* licensing@sencha.com
+* http://www.sencha.com/license
+*/
+
+/*
+#poweredby {
+    position: absolute;
+    bottom: 40px;
+    right: 20px;
+    z-index: 15000;
+
+    */
+/* IE 5-7 *//*
+
+    filter: alpha(opacity=70);
+    */
+/* Netscape *//*
+
+    -moz-opacity: 0.7;
+    */
+/* Safari 1.x *//*
+
+    -khtml-opacity: 0.7;
+    */
+/* Good browsers *//*
+
+    opacity: 0.7;
+}
+
+#poweredby div {
+    position: relative;
+    width: 150px;
+    height: 25px;
+    background-image: url(../images/powered-by-ext-js.png);
+    background-repeat: no-repeat;
+}
+
+*/
+/* The simple background image PNG does not work in IE6-8, but does in IE9 *//*
+
+.x-ie6 #poweredby div,
+.x-ie7 #poweredby div,
+.x-ie8 #poweredby div {
+    background-image: none;
+    filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='images/powered-by-ext-js.png', sizingMethod='scale');
+}
+*/
+
+/*字体重定义，桌面背景色定义*/
+body{ font-family: "Microsoft YaHei" !important;}
+.x-mask-black{  background: #000;}
+.ux-desktop-body{  background-color: #ddd;}
+
+/*grid编辑栏，actioncolumntext  btn 样式*/
+.linkBtn a{text-decoration: none;    margin: 0 5px; }
+.linkBtn a:link,{ color:#f20311;}
+.linkBtn a.false{ color: #ccc; display: none}
+
+/* 详情 detail table */
+.detailTab{ width: 100%; background: #eee; border-collapse: collapse; }
+.detailTab td{ padding: 5px 10px; border: 1px solid #ccc; }
+.detailTab .tdTitle{ font-weight: bold; color: #084c82; width: 150px;}
+
+/*欢迎界面树的样式*/
+.maintree{  /*background:#4AA9ED; padding:2px; margin:0px 2px  0 0;*/}
+.maintree span{color: #111 !important;font-style:normal !important; font-size:20px !important;}
+
+
+/* 菜单样式 */
+.navMenuBox{background:#3892d3; margin-top:4 !important;   padding-top:0 !important;/*   background:#ffc;*/}
+.navMenu{  background:#4AA9ED; padding:7px; margin:0px 2px  0 0;   border: 1px solid #157FCC;border-radius: 6px;}
+.navMenu span{color: #fff !important;font-style:normal !important; font-size:10px !important;}
+.navMenu .x-btn-arrow {
+    background-color: #4AA9ED;
+    border:0px!important;
+    
+}
+/*.navMenu:hover {
+    -webkit-box-shadow: 1px 1px 1px rgba(0,0,0,.29), inset 0px 0px 2px rgba(0,0,0, .5);
+    -moz-box-shadow: 1px 1px 1px rgba(0,0,0,.29), inset 0px 0px 2px rgba(0,0,0, .5);
+    box-shadow: 1px 1px 1px rgba(0,0,0,.29), inset 0px 0px 2px rgba(0,0,0, .5);
+}*/
+.navMenu:active {
+    -webkit-box-shadow: inset 0px 0px 3px rgba(0,0,0, .8);
+    -moz-box-shadow: inset 0px 0px 3px rgba(0,0,0, .8);
+    box-shadow: inset 0px 0px 3px rgba(0,0,0, .8);
+}
+
+/**非当前窗口样式*/
+.ux-desktop-inactive-win { border-color: #3281ba !important;}
+.ux-desktop-inactive-win .x-window-header-default-top{ background:#3281ba !important; border-color: #3281ba !important;}
+.ux-desktop-inactive-win .x-border-item {  background:#3281ba !important;}
+
+
+
+
+/*日期模板*/
+.dateTable{ width: 100%; background: #eee; border-collapse: collapse;
+    /*fire fox */
+    -moz-user-select:none;
+}
+.dateTable th{ padding: 5px 10px; border: 1px solid #ccc; background: #0078d7;font-weight: bold; color: #fff; }
+.dateTable td{ padding: 5px 10px; border: 1px solid #ccc; }
+.dateTable .selected{ background: #010304; color: #fff}
+.dateTable .disabled{ background:#eee;}
+
+
+
+/*开始菜单样式*/
+.start_menu span{
+    color: #56C1FE!important;
+}
+/*----------------------------------------------------
+    Start Button
+*/
+
+/**开始按钮图标**/
+.ux-start-button-icon {
+    background-image: url(../images/framework/start.png) !important;
+    /* background-color: transparent; */
+}
+
+
+.ux-start-button,.x-btn-arrow {
+    background-image: none;
+    background-color: #186496;
+    border:0px!important;
+    
+}
+
+/* 任务栏BUTTON样式 */
+.ux-taskbar .x-btn-button,.ux-taskbar .x-btn-toolbar{
+    background-image: none;
+    background-color: #186496;
+    border:0px!important;
+}
+
+/*回到桌面*/
+.zuomian{
+    background-image: url(../images/framework/zuomian.png);
+    background-color: #186496;
+    border:0px!important;
+}
+
+/* 任务栏Button字体颜色  */
+.ux-taskbar .x-btn-button span{
+    color: #4295cc !important;
+}
+
+/* 任务栏Button hove事件字体颜色 */
+.ux-taskbar .x-btn-button span:hover{
+	color: #ffffff !important;
+}
+/* 任务栏Button hove事件字体颜色 */
+.ux-taskbar .x-btn-toolbar span:hover{
+	color: #ffffff !important;
+}
+
+/* .x-btn-button{
+    background-color: #186496;
+} */
+
+/**任务栏样式*/
+.ux-taskbar {
+    padding-left: 4px !important;
+    background-color: #0b5381;
+}
+
+/*
+    Start Button (Black)
+*/
+
+.ux-desktop-black .ux-start-button {
+    height: 28px;
+    padding: 0px;
+    display: block;
+}
+
+.ux-desktop-black .ux-start-button em {
+    margin-top: 5px;
+}
+
+.ux-desktop-black .ux-start-button .x-btn-inner {
+    color: black;
+    font-size:11px;
+    font-weight: bold;
+}
+
+.ux-desktop-black .ux-start-button {
+    background-image: -moz-linear-gradient(center top , #E4F3FF, #D9EDFF 48%, #C2D8F2 52%, #C6DCF6);
+    border-radius: 8px 8px 8px 8px;
+    border-color: #81A4D0;
+}
+
+/*----------------------------------------------------
+    Start Menu
+*/
+
+.ux-start-menu-toolbar .x-btn-inner {
+    text-align: left;
+}
+
+.ux-start-menu-toolbar {
+    padding: 4px !important;
+}
+
+/*----------------------------------------------------
+    TaskBar
+*/
+
+/* Use high specificity selector to override default styling*/
+div.ux-taskbar div.x-toolbar {
+    background: transparent none;
+    border: 0 none;
+    padding: 0;
+}
+
+.ux-desktop-windowbar .x-btn-inner,
+.x-nbr .ux-desktop-windowbar .x-btn-icon-text-left button {
+    text-align: left !important;
+}
+
+/*
+    TaskBar (Black)
+*/
+
+.ux-desktop-black .ux-taskbar {
+    background: transparent url('../images/taskbar/black/taskbar-start-panel-bg.gif') repeat-x left top;
+    border-color: transparent;
+    /*height: 30px;*/
+}
+
+.ux-desktop-black .ux-taskbar .x-splitter {
+    background: transparent url(../images/taskbar/black/taskbar-split-h.gif) no-repeat scroll 0 -2px;
+}
+
+.ux-desktop-black .ux-taskbar .x-toolbar-text {
+    color: white !important;
+}
+
+.ux-desktop-black .ux-taskbar .x-btn-default-toolbar-small-over {
+    background-color: yellow;
+}
+
+.ux-desktop-black .ux-taskbar .x-btn-inner {
+    color: white;
+}
+
+.ux-desktop-black .ux-taskbar .x-btn-pressed .x-btn-inner, .ux-taskbar .x-btn-over .x-btn-inner {
+    color: black;
+}
+
+/*----------------------------------------------------
+    Tray Clock
+*/
+
+.ux-desktop-trayclock {
+    text-align: center;
+    vertical-align: middle;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+/*----------------------------------------------------
+    Desktop DataView
+*/
+
+.ux-wallpaper {
+/*    background-color: #3d71b8;*/
+    background-color: #ddd;
+    color: #000;
+}
+
+.ux-wallpaper-tiled {
+    background-repeat: repeat;
+}
+
+.ux-desktop-shortcut {
+    cursor: pointer;
+    text-align: center;
+/*    padding: 8px;*/
+    margin: 0px 8px 8px 8px;
+    width: 97px;
+    height:70px;
+    background:#56C4FF;
+    padding-top:10px;
+}
+
+.ux-desktop-shortcut-icon {
+    /*width: 48px;*/
+    height: 32px;
+
+    background-color: transparent;
+    background-repeat: no-repeat;
+    background-position: top center;
+}
+
+/**桌面图标字体样式 **/
+.ux-desktop-shortcut-text {
+    font: normal 10px tahoma,arial,verdana,sans-serif;
+    text-decoration: none;
+    padding-top: 10px;
+    color: #fff;
+    font-size:12px;
+    font-family: "Microsoft YaHei";
+    height: 50px;
+    overflow:hidden;
+    word-wrap:break-word;
+    
+}
+/**鼠标移至桌面图片显示背景色**/
+.x-view-over {
+    background: #4F94CD;
+}
+
+.x-view-over .ux-desktop-shortcut-text {
+    text-decoration: underline;
+}
+
+
+/*----------------------------------------------------
+    Various icon classes盯桌面图标样式设置
+*/
+
+.accordion-shortcut { background-image: url(../images/im48x48.png);}
+.cpu-shortcut {  background-image: url(../images/statusLarge.png);}
+.grid-shortcut { background-image: url(../images/grid48x48.png);}
+.notepad-shortcut { background-image: url(../images/notepadLarge.png); height: 56px;}
+.bogus { background-image: url( ../images/bogus.png ) !important;}
+
+
+
+
+ /*新增桌面图标样式，与对应的任务栏与快速启动栏上的样式*/
+.demo-shortcut{background-image: url(../images/demo/2-info.png);}
+.demoSmall{background-image: url(../images/demoSmall/7.png);}
+
+.demo2-shortcut{background-image: url(../images/demo/5-word.png);}
+.demoSmall2{background-image: url(../images/demoSmall/14.png);}
+
+
+/**framework大图标**/
+/* .crm-gly{background-image: url(../images/framework/gly.png);} */
+.crm-gly{background-image: url(../images/framework/gly1.png);}
+.crm-bottom{background:url(../images/framework/bg.jpg);background-size:100% 100%}
+/* .crm-yonghu{background-image: url(../images/framework/yonghu.png);} */
+.crm-yonghu{background-image: url(../images/crm/yhcrm.png);}
+.crm-baobiao{background-image: url(../images/framework/baobiao.png);}
+/* .crm-caidan{background-image: url(../images/framework/caidan.png);} */
+.crm-caidan{background-image: url(../images/framework/caidan1.png);}
+/* .crm-caozuo{background-image: url(../images/framework/caozuo.png);} */
+.crm-caozuo{background-image: url(../images/framework/caozuo1.png);}
+/**.crm-fenzu{background-image: url(../images/framework/fenzu.png);}**/
+.crm-fenzu{background-image: url(../images/framework/fenzu1.png);}
+/* .crm-juese{background-image: url(../images/framework/juese.png);} */
+.crm-juese{background-image: url(../images/framework/juese1.png);} 
+/* .crm-xtpz{background-image: url(../images/framework/xtpz.png);} */
+.crm-xtpz{background-image: url(../images/framework/xtpz1.png);}
+/* .crm-yewu{background-image: url(../images/framework/yewu.png);} */
+.crm-yewu{background-image: url(../images/crm/yewu1.png);}
+/* .crm-yingxiao{background-image: url(../images/framework/yingxiao.png);} */
+.crm-yingxiao{background-image: url(../images/crm/yx.png);}
+
+/**framework小图标**/
+/* 业务 */
+.small_business{background-image: url(../images/framework/small_business.png);}
+/* CRM用户 */
+.small_crm_user{background-image: url(../images/framework/small_crm_user.png);}
+/* 管理员 */
+.small_gm{background-image: url(../images/framework/small_gm.png);}
+/* 分组 */
+.small_group{background-image: url(../images/framework/small_group.png);}
+/* 营销 */
+.small_marketing{background-image: url(../images/framework/small_marketing.png);}
+/* 菜单 */
+.small_menu{background-image: url(../images/framework/small_menu.png);}
+/* 操作 */
+.small_operate{background-image: url(../images/framework/small_operate.png);}
+/* 角色 */
+.small_role{background-image: url(../images/framework/small_role.png);} 
+/* 系统 */
+.small_config{background-image: url(../images/framework/small_config.png);}
+/* 报表 */
+.small_from{background-image: url(../images/framework/small_from.png);}
+
+
+
+/*ie6兼容处理*/
+.x-ie6 .accordion-shortcut { background-image: none;  filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='images/im48x48.png', sizingMethod='scale');}
+.x-ie6 .cpu-shortcut {background-image: none;filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='images/statusLarge.png', sizingMethod='scale');}
+.x-ie6 .grid-shortcut {background-image: none; filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='images/grid48x48.png', sizingMethod='scale');}
+.x-ie6 .notepad-shortcut {background-image: none; filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='images/notepadLarge.png', sizingMethod='scale');}
+
+
+
+/*其它视图的样式----可以删除*/
+.video { background-image: url(../images/gears.gif);}
+.notepad {  background-image: url( ../images/bogus.png ) !important;}
+.logout {background-image: url( ../images/logout.gif ) !important;}
+.settings { background-image: url( ../images/gears.gif ) !important;}
+
+
+.icon-grid { background-image:url( ../images/grid.png ) !important;}
+.add {background-image:url(../images/fam/add.gif) !important;}
+.option { background-image:url(../images/fam/plugin.gif) !important;}
+.remove { background-image:url(../images/fam/delete.gif) !important;}
+.accordion {  background-image:url(../images/accordian.gif) !important;}
+.tabs { background-image:url(../images/tabs.gif) !important;}
+
+/*----------------------------------------------------
+    IM window icons
+*/
+
+.user {
+    background-image:url( ../images/fam/user.gif ) !important;
+}
+
+.user-add {
+    background-image:url(../images/fam/user_add.gif) !important;
+}
+
+.user-delete {
+    background-image:url(../images/fam/user_delete.gif) !important;
+}
+
+.connect {
+    background-image:url(../images/fam/connect.gif) !important;
+}
+
+.user-girl {
+    background-image:url(../images/fam/user_female.gif) !important;
+}
+
+.user-kid {
+    background-image:url(../images/fam/user_green.gif) !important;
+}
+
+.user-suit {
+    background-image:url(../images/fam/user_suit.gif) !important;
+}

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mopon.dao.master.sys.ITableDao">
+
+	<resultMap type="Table" id="tableResultMap">
+		<id property="id" column="ID" />
+		<result property="tableName" column="TABLENAME" />
+		<result property="createDate" column="CREATEDATE" />
+		<result property="status" column="STATUS" />
+	</resultMap>
+	
+	<resultMap type="TableRule" id="tableRuleResultMap">
+		<id property="id" column="ID" />
+		<result property="tableName" column="TABLENAME" />
+		<result property="startDate" column="STARTDATE" />
+		<result property="interval" column="INTERVALS" />
+		<result property="unionTable" column="UNION_TABLE" />
+		<result property="createSQL" column="CREATE_SQL" />
+		<result property="unionCreateSQL" column="UNION_CREATE_SQL" />
+		<result property="unionUpdateSQL" column="UNION_UPDATE_SQL" />
+	</resultMap>
+	
+	<update id="createTable" parameterType="map">
+		${createSQL}
+	</update>
+	
+	<update id="createUnionTable" parameterType="map">
+		${createUnionSQL}
+	</update>
+	
+	<update id="updateUnionTable" parameterType="map">
+		${unionUpdateSQL}
+	</update>
+	
+	<update id="dropTable" parameterType="map">
+		DROP TABLE ${tableName}
+	</update>
+	
+	<insert id="save" parameterType="Table">
+		INSERT INTO SYS_TABLE (TABLENAME, CREATEDATE, STATUS) VALUES(#{tableName}, #{createDate}, #{status})
+	</insert>
+	
+	<delete id="remove" parameterType="Table" >
+		DELETE FROM SYS_TABLE WHERE TABLENAME = #{tableName}
+	</delete>
+	
+	<select id="queryTableByCreateDate" parameterType="Table" resultMap="tableResultMap">
+		SELECT * FROM SYS_TABLE WHERE <![CDATA[CREATEDATE >= #{createDate} AND CREATEDATE <= #{createDate}]]> 
+	</select>
+	
+	<select id="queryTableByName" parameterType="Table" resultMap="tableResultMap">
+		SELECT * FROM SYS_TABLE WHERE TABLENAME LIKE '%${tableName}%' 
+	</select>
+	
+	<select id="queryTableAll" parameterType="Table" resultMap="tableResultMap">
+		SELECT * FROM SYS_TABLE
+	</select>
+	
+	
+	<insert id="saveTableRule" parameterType="TableRule">
+		INSERT INTO SYS_TABLE_RULE (TABLENAME, STARTDATE, INTERVALS, UNION_TABLE, CREATE_SQL, UNION_CREATE_SQL, UNION_UPDATE_SQL) VALUES(#{tableName}, #{startDate}, #{interval, #{unionTable}, #{createSQL}, #{unionCreateSQL}, #{unionUpdateSQL})
+	</insert>
+	
+	<delete id="removeTableRule" parameterType="TableRule" >
+		DELETE FROM SYS_TABLE_RULE WHERE ID = #{id}
+	</delete>
+	
+	<update id="updateTableRule" parameterType="TableRule"> 
+		UPDATE SYS_TABLE_RULE SET STARTDATE = #{startDate}, INTERVALS = #{interval}, UNION_TABLE = #{unionTable}, CREATE_SQL=#{createSQL}, UNION_CREATE_SQL=#{unionCreateSQL},  UNION_UPDATE_SQL=#{unionUpdateSQL} WHERE ID = #{id}
+	</update>
+	
+	<select id="queryTableRule" resultMap="tableRuleResultMap">
+		SELECT * FROM SYS_TABLE_RULE
+	</select>
+	
+	<select id="queryTableRuleByName" parameterType="TableRule" resultMap="tableRuleResultMap">
+		SELECT * FROM SYS_TABLE_RULE WHERE TABLENAME = #{tableName}
+	</select>
+</mapper>

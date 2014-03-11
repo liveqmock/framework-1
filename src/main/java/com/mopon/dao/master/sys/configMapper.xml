@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mopon.dao.master.sys.IConfigDao">
+
+	
+	<resultMap type="Config" id="configResultMap">
+		<id property="key" column="CKEY" />
+		<result property="value" column="CVALUE" />
+		<result property="date" column="CREATE_DATE" />
+		<result property="keyDesc" column="KEY_DESC" />
+		<result property="valueDesc" column="VALUE_DESC" />
+	</resultMap>
+
+	<insert id="save" parameterType="Config">
+		INSERT INTO SYS_CONFIG (CKEY, CVALUE, CREATE_DATE, KEY_DESC, VALUE_DESC) VALUES(#{key}, #{value}, #{date}, #{keyDesc}, #{valueDesc})
+	</insert>
+	
+	<update id="update" parameterType="Config">
+		UPDATE SYS_CONFIG SET CVALUE = #{value}, KEY_DESC = #{keyDesc}, VALUE_DESC = #{valueDesc} WHERE CKEY = #{key}
+	</update>
+	
+<!-- 	<delete id="remove" parameterType="Config">
+		DELETE FROM SYS_CONFIG WHERE CKEY = #{key}
+	</delete> -->
+	
+	
+	<delete id="remove" parameterType="String">
+		DELETE FROM SYS_CONFIG WHERE CKEY in
+		<foreach collection="ids" index="index" item="item" open="(" separator="," close=")"> 
+			#{item} 
+		</foreach>
+	</delete>
+	
+	<select id="queryAll" resultMap="configResultMap">
+		SELECT * FROM SYS_CONFIG
+	</select>
+	
+	<select id="getConfig" parameterType="Config" resultMap="configResultMap">
+		SELECT * FROM SYS_CONFIG WHERE CKEY = #{key}
+	</select>
+	
+	<select id="queryConfigForList" parameterType="Config" resultMap="configResultMap">
+		SELECT *
+		FROM
+		SYS_CONFIG
+		<where>
+			<if test="config.key!=null and config.key!='' ">
+				CKEY LIKE CONCAT('%',#{config.key},'%')
+			</if>
+			<if test="config.keyDesc!=null and config.keyDesc!='' ">
+				and KEY_DESC LIKE CONCAT('%',#{config.keyDesc},'%')
+			</if>
+		</where>
+		LIMIT #{pageNo, jdbcType=INTEGER} , #{pageSize,
+		jdbcType=INTEGER}
+	</select>
+	
+	<select id="queryCount" parameterType="Config" resultType="int">
+		SELECT count(CKEY) FROM SYS_CONFIG
+		
+ 		<where>
+			<if test="key!=null and key!=''">
+				CKEY  LIKE CONCAT('%',#{key},'%')
+			</if>
+			<if test="keyDesc!=null and keyDesc!=''">
+				and KEY_DESC LIKE CONCAT('%',#{keyDesc},'%')
+			</if>
+		</where>
+	</select>
+	
+	<!-- 根据用户名查询总数[1.传名称判断（新增时）；2.传名称和ID判断（编辑时）] -->
+	<select id="queryForKeyCount" parameterType="Config" resultType="Integer">
+		SELECT count(CKEY) FROM SYS_CONFIG
+		WHERE 1=1
+		<if test="key!=null != null and key!=null != 0">
+			AND CKEY = #{key}
+		</if>
+	</select>
+</mapper>
